@@ -115,6 +115,22 @@
             </button>
         </div>
 
+        <div id="resultBox" class="mt-6 p-4 bg-black/50 border border-[#00ff88]/40 rounded hidden">
+            <p class="text-[10px] font-bold text-[#00ff88] uppercase tracking-widest mb-3">DOWNLOAD / COPY OPTIONS</p>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <button id="downloadZipBtn" type="button" class="p-3 bg-[#00ff88] text-black font-bold text-[10px] uppercase tracking-wider rounded hover:bg-white transition">
+                    Download ZIP
+                </button>
+                <button id="downloadCodeBtn" type="button" class="p-3 bg-[#7000ff] text-white font-bold text-[10px] uppercase tracking-wider rounded hover:bg-white hover:text-black transition">
+                    Download Code
+                </button>
+                <button id="copyCodeBtn" type="button" class="p-3 bg-gray-800 text-white border border-gray-600 font-bold text-[10px] uppercase tracking-wider rounded hover:border-[#00ff88] transition">
+                    Copy Code
+                </button>
+            </div>
+            <p id="copyStatus" class="text-[9px] text-gray-500 mt-3 hidden"></p>
+        </div>
+
         <div id="sysLog" class="mt-8 status-box p-4 hidden">
             <div class="text-[11px] space-y-1" id="logContent">
                 <p>> Initializing Scraper...</p>
@@ -142,30 +158,98 @@
             container.scrollTop = container.scrollHeight;
         };
 
+        let currentZipBlob = null;
+        let currentCode = '';
+        let currentCodeName = 'index.html';
+
+        function showResultOptions(zipBlob, code, codeName = 'index.html') {
+            currentZipBlob = zipBlob || null;
+            currentCode = code || '';
+            currentCodeName = codeName || 'index.html';
+            document.getElementById('resultBox').classList.remove('hidden');
+        }
+
+        function downloadBlob(blob, filename) {
+            if (!blob) return;
+            const objectUrl = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = objectUrl;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+        }
+
+        document.getElementById('downloadZipBtn').addEventListener('click', () => {
+            downloadBlob(currentZipBlob, currentZipBlob?.name || 'website.zip');
+        });
+
+        document.getElementById('downloadCodeBtn').addEventListener('click', () => {
+            if (!currentCode) return;
+            downloadBlob(new Blob([currentCode], { type: 'text/html;charset=utf-8' }), currentCodeName);
+        });
+
+        document.getElementById('copyCodeBtn').addEventListener('click', async () => {
+            if (!currentCode) return;
+            const status = document.getElementById('copyStatus');
+            try {
+                await navigator.clipboard.writeText(currentCode);
+                status.textContent = 'CODE COPIED TO CLIPBOARD';
+                status.classList.remove('hidden');
+            } catch (error) {
+                const area = document.createElement('textarea');
+                area.value = currentCode;
+                area.style.position = 'fixed';
+                area.style.opacity = '0';
+                document.body.appendChild(area);
+                area.select();
+                document.execCommand('copy');
+                area.remove();
+                status.textContent = 'CODE COPIED TO CLIPBOARD';
+                status.classList.remove('hidden');
+            }
+        });
+
         async function runScraper() {
-            const url = document.getElementById('urlInput').value;
+            const url = document.getElementById('urlInput').value.trim();
             const isAdvanced = document.getElementById('advancedMode').checked;
             if (!url || url === 'https://') return alert('ERROR: URL_REQUIRED');
 
             document.getElementById('sysLog').classList.remove('hidden');
-            document.getElementById('logContent').innerHTML = "";
-            log("Initializing Protocol...");
-            
+            document.getElementById('resultBox').classList.add('hidden');
+            document.getElementById('logContent').innerHTML = '';
+            currentZipBlob = null;
+            currentCode = '';
+            log('Initializing Protocol...');
+
             const btn = document.getElementById('runBtn');
-            btn.innerText = "RUNNING...";
+            btn.innerText = 'RUNNING...';
             btn.disabled = true;
 
-            if (isAdvanced) {
-                await executeUserSideExtraction(url);
-                btn.innerText = "Execute Extraction";
+            try {
+                if (isAdvanced) {
+                    await executeUserSideExtraction(url);
+                } else {
+                    log('Executing Server-Side Scrape...');
+                    const response = await fetch(`/api/convert?url=${encodeURIComponent(url)}`);
+                    if (!response.ok) {
+                        const message = await response.text();
+                        throw new Error(message || `Server returned ${response.status}`);
+                    }
+                    const zipBlob = await response.blob();
+                    const codeResponse = await fetch(`/api/code?url=${encodeURIComponent(url)}`);
+                    const code = codeResponse.ok ? await codeResponse.text() : '';
+                    const hostname = new URL(url.startsWith('http') ? url : `https://${url}`).hostname.replace(/^www\./, '').replace(/\./g, '_');
+                    zipBlob.name = `${hostname}.zip`;
+                    showResultOptions(zipBlob, code, `${hostname}.html`);
+                    log('COMPLETE! Download or copy the extracted code below.', '#00ff88');
+                }
+            } catch (err) {
+                log(`FAILED: ${err.message}`, 'red');
+            } finally {
+                btn.innerText = 'Execute Extraction';
                 btn.disabled = false;
-            } else {
-                log("Executing Server-Side Scrape...");
-                window.location.href = `/api/convert?url=${encodeURIComponent(url)}`;
-                setTimeout(() => {
-                    btn.innerText = "Execute Extraction";
-                    btn.disabled = false;
-                }, 5000);
             }
         }
 
@@ -228,13 +312,11 @@
                 log("Packaging Final ZIP...", "#00ff88");
                 const content = await zip.generateAsync({ type: "blob" });
                 const zipName = new URL(targetUrl).hostname.replace(/\./g, '_') + "_advanced.zip";
-                
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(content);
-                link.download = zipName;
-                link.click();
+                content.name = zipName;
+                const code = renderedDoc.documentElement.outerHTML;
+                showResultOptions(content, code, 'index.html');
 
-                log("COMPLETE!", "#00ff88");
+                log("COMPLETE! Download or copy the rendered code below.", "#00ff88");
             } catch (err) {
                 log(`FAILED: ${err.message}`, "red");
             }
