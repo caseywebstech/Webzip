@@ -72,6 +72,7 @@
     </style>
 </head>
 <body>
+    <button onclick="logout()" class="fixed top-4 right-4 text-[10px] border border-purple-700 px-3 py-2 text-white bg-black/60">LOGOUT</button>
 
     <div class="anime-border bg-[#16161e] w-full max-w-lg p-8 relative">
         <div class="absolute top-2 right-4 text-[10px] opacity-50">VER 5.1.0 // HYBRID_RESTORED</div>
@@ -108,7 +109,7 @@
                     <span class="text-[8px] bg-[#00ff88] text-black px-1.5 py-0.5 rounded-sm font-bold">GET</span>
                 </div>
                 <code class="block text-[10px] text-gray-400 break-all p-2 bg-black border border-[#7000ff]/30 rounded select-all selection:bg-[#7000ff] selection:text-white">
-                    https://web2zip-mu.vercel.app/api/convert?url={<span class="text-white">TARGET_URL</span>}
+                    /api/convert?url={<span class="text-white">TARGET_URL</span>}
                 </code>
             </div>
             <button onclick="runScraper()" id="runBtn" class="btn-execute w-full p-5 italic">
@@ -134,6 +135,8 @@
     <iframe id="renderFrame" style="display:none;"></iframe>
 
     <script>
+        async function logout(){ await fetch('/api/logout',{method:'POST'}); location.href='/login'; }
+
         const log = (msg, color = "#00ff88") => {
             const p = document.createElement('p');
             p.style.color = color;
