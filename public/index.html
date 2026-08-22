@@ -8,12 +8,12 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    /* --- reset & base (dark, no glow) --- */
+    /* --- reset & base (from BLOOD RAVEN XMD) --- */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Inter', sans-serif;
-      background: #060a0e;
-      color: #b0bec5;
+      background: #080c10;
+      color: #e8f5e9;
       min-height: 100vh;
       display: flex;
       align-items: center;
@@ -32,24 +32,26 @@
       height: 100%;
       z-index: 0;
       pointer-events: none;
-      opacity: 0.25;
+      opacity: 0.5;
     }
 
-    /* --- main card (darker, no glow) --- */
+    /* --- main card (darker, glass) --- */
     .cyber-card {
       position: relative;
       z-index: 10;
-      background: #0a0f14;
+      background: rgba(12, 17, 24, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       width: 100%;
       max-width: 540px;
       padding: 2rem 2rem 1.8rem;
-      border-radius: 1.5rem 0.8rem 1.5rem 0.8rem;
-      border: 1px solid rgba(255, 255, 255, 0.035);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
-      transition: all 0.2s;
+      border-radius: 2rem 1rem 2rem 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(0, 230, 118, 0.06);
+      transition: all 0.25s;
     }
 
-    /* --- profile picture (centre, no glow) --- */
+    /* --- profile picture (centre) --- */
     .profile-wrapper {
       display: flex;
       justify-content: center;
@@ -57,16 +59,18 @@
       margin-bottom: 1.2rem;
     }
     .profile-pic {
-      width: 88px;
-      height: 88px;
+      width: 92px;
+      height: 92px;
       border-radius: 50%;
-      background: #0d131a;
-      border: 1.5px solid rgba(255, 255, 255, 0.06);
+      background: #0c1118;
+      border: 2px solid rgba(0, 230, 118, 0.3);
+      box-shadow: 0 0 0 4px rgba(0, 230, 118, 0.08), 0 0 40px rgba(0, 230, 118, 0.08);
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      transition: 0.2s;
+      transition: 0.25s;
+      background-image: radial-gradient(circle at 30% 30%, #1a3a2e, #0a1410);
     }
     .profile-pic img {
       width: 100%;
@@ -75,112 +79,122 @@
       display: block;
     }
     .profile-pic:hover {
-      border-color: rgba(255, 255, 255, 0.1);
+      transform: scale(1.02);
+      border-color: #00e676;
+      box-shadow: 0 0 0 6px rgba(0, 230, 118, 0.15), 0 0 60px rgba(0, 230, 118, 0.08);
     }
 
-    /* --- title (muted) --- */
+    /* --- title --- */
     .brand-title {
-      font-size: 1.8rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      color: #90a4ae;
-      text-shadow: none;
+      font-size: 1.9rem;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      background: linear-gradient(120deg, #00e676, #00bcd4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 0 30px rgba(0, 230, 118, 0.08);
       line-height: 1.15;
     }
-    .brand-title .highlight {
-      color: #546e7a;
-    }
     .brand-sub {
-      font-size: 0.65rem;
-      letter-spacing: 2.5px;
-      color: #546e7a;
-      border-left: 2px solid rgba(255, 255, 255, 0.04);
-      padding-left: 10px;
+      font-size: 0.7rem;
+      letter-spacing: 3px;
+      color: #78909c;
+      border-left: 3px solid rgba(0, 230, 118, 0.3);
+      padding-left: 12px;
       margin-top: 4px;
     }
 
-    /* --- inputs & elements (dark, flat) --- */
+    /* --- inputs & elements (glass) --- */
     .tech-input {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      color: #b0bec5;
-      border-radius: 12px;
-      padding: 0.85rem 1.2rem;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      color: #e8f5e9;
+      border-radius: 14px;
+      padding: 0.9rem 1.2rem;
       width: 100%;
       font-size: 0.9rem;
       font-weight: 500;
       outline: none;
-      transition: 0.2s;
+      transition: 0.25s;
+      backdrop-filter: blur(4px);
       font-family: 'Inter', sans-serif;
     }
     .tech-input:focus {
-      border-color: rgba(255, 255, 255, 0.08);
-      background: rgba(255, 255, 255, 0.025);
+      border-color: rgba(0, 230, 118, 0.4);
+      box-shadow: 0 0 0 3px rgba(0, 230, 118, 0.08);
+      background: rgba(255, 255, 255, 0.05);
     }
     .tech-input::placeholder {
       color: #37474f;
       font-weight: 400;
+      letter-spacing: 0.3px;
     }
 
     .btn-execute {
-      background: #1a232c;
-      border: 1px solid rgba(255, 255, 255, 0.04);
+      background: #00e676;
+      border: none;
       border-radius: 40px;
-      padding: 0.9rem 1.5rem;
-      font-weight: 600;
-      letter-spacing: 1px;
-      color: #90a4ae;
+      padding: 1rem 1.5rem;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      color: #080c10;
       text-transform: uppercase;
-      font-size: 0.85rem;
-      transition: 0.2s;
+      font-size: 0.9rem;
+      transition: 0.25s;
       cursor: pointer;
+      box-shadow: 0 0 30px rgba(0, 230, 118, 0.15);
       width: 100%;
       font-family: 'Inter', sans-serif;
     }
     .btn-execute:hover {
-      background: #26333e;
-      color: #b0bec5;
-      border-color: rgba(255, 255, 255, 0.06);
+      background: #69f0ae;
+      transform: translateY(-2px);
+      box-shadow: 0 0 50px rgba(0, 230, 118, 0.2);
     }
     .btn-execute:active {
-      transform: scale(0.98);
+      transform: translateY(2px);
+      box-shadow: 0 0 20px rgba(0, 230, 118, 0.1);
     }
 
     .status-box {
-      background: rgba(255, 255, 255, 0.015);
-      border-left: 2px solid rgba(255, 255, 255, 0.04);
-      border-radius: 10px;
-      padding: 0.7rem 1rem;
+      background: rgba(255, 255, 255, 0.02);
+      border-left: 3px solid rgba(0, 230, 118, 0.3);
+      border-radius: 12px;
+      padding: 0.8rem 1rem;
+      backdrop-filter: blur(4px);
     }
 
-    /* --- toggle switch (dark, flat) --- */
+    /* --- toggle switch (green/blue) --- */
     .toggle-checkbox:checked + .toggle-slider {
-      background: #26333e;
+      background: #00bcd4;
+      box-shadow: 0 0 15px rgba(0, 188, 212, 0.2);
     }
     .toggle-slider {
-      background: rgba(255, 255, 255, 0.04);
-      transition: 0.2s;
+      background: rgba(255, 255, 255, 0.06);
+      transition: 0.25s;
       border-radius: 999px;
-      width: 40px;
-      height: 22px;
+      width: 44px;
+      height: 24px;
       position: relative;
       cursor: pointer;
-      border: 1px solid rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.06);
     }
     .toggle-slider::after {
       content: "";
       position: absolute;
       top: 2px;
       left: 2px;
-      width: 16px;
-      height: 16px;
-      background: #546e7a;
+      width: 18px;
+      height: 18px;
+      background: #78909c;
       border-radius: 50%;
-      transition: 0.2s;
+      transition: 0.25s;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.4);
     }
     .toggle-checkbox:checked + .toggle-slider::after {
-      transform: translateX(18px);
-      background: #78909c;
+      transform: translateX(20px);
+      background: #e8f5e9;
     }
     .toggle-checkbox {
       display: none;
@@ -189,59 +203,57 @@
     /* --- code block --- */
     .code-block {
       background: rgba(0, 0, 0, 0.3);
-      border: 1px solid rgba(255, 255, 255, 0.025);
-      border-radius: 10px;
-      padding: 0.5rem 0.8rem;
-      font-size: 0.6rem;
-      color: #546e7a;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 12px;
+      padding: 0.6rem 0.9rem;
+      font-size: 0.65rem;
+      color: #78909c;
       word-break: break-all;
       font-family: 'JetBrains Mono', monospace;
     }
     .code-block span {
-      color: #78909c;
+      color: #e8f5e9;
     }
 
     /* --- footer --- */
     .footer-brand {
-      font-size: 0.7rem;
-      letter-spacing: 0.2px;
-      color: #455a64;
-      border-top: 1px solid rgba(255, 255, 255, 0.025);
-      padding-top: 1rem;
+      font-size: 0.75rem;
+      letter-spacing: 0.3px;
+      color: #78909c;
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+      padding-top: 1.2rem;
       margin-top: 0.6rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
     .footer-brand strong {
-      font-weight: 700;
-      color: #78909c;
-      font-weight: 700;
+      font-weight: 800;
+      background: linear-gradient(120deg, #00e676, #00bcd4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
-    /* --- glass cards (dark, flat) --- */
+    /* --- glass cards for settings --- */
     .glass-card {
-      background: rgba(255, 255, 255, 0.015);
-      border: 1px solid rgba(255, 255, 255, 0.025);
-      border-radius: 14px;
-      padding: 0.8rem 1.1rem;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 16px;
+      padding: 0.9rem 1.2rem;
+      backdrop-filter: blur(4px);
     }
 
     /* --- responsive --- */
     @media (max-width: 480px) {
       .cyber-card { padding: 1.5rem 1.2rem 1.5rem; }
-      .profile-pic { width: 74px; height: 74px; margin-top: -2.8rem; }
+      .profile-pic { width: 76px; height: 76px; margin-top: -3rem; }
     }
-
-    /* --- scrollbar dark --- */
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #26333e; border-radius: 4px; }
   </style>
 </head>
 <body>
 
-  <!-- animated lines background (very subtle) -->
+  <!-- animated lines background (dark) -->
   <canvas id="lines-canvas"></canvas>
 
   <!-- main card -->
@@ -250,29 +262,29 @@
     <!-- profile picture -->
     <div class="profile-wrapper">
       <div class="profile-pic">
-        <img src="https://url.bmbxmd.workers.dev/QF65C.jpg" alt="profile" onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=\'font-size:2.4rem;color:#546e7a;\'>CR</span>'">
+        <img src="https://url.bmbxmd.workers.dev/QF65C.jpg" alt="profile" onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=\'font-size:2.6rem;color:#00e676;\'>CR</span>'">
       </div>
     </div>
 
     <!-- header -->
-    <div class="text-center mb-4">
-      <h1 class="brand-title">SCRAPE <span class="highlight">PROTOCOL</span></h1>
+    <div class="text-center mb-5">
+      <h1 class="brand-title">SCRAPE  PROTOCOL</h1>
       <div class="brand-sub">⚡ HYBRID · RENDER  ⚡</div>
     </div>
 
     <!-- url input -->
     <div class="mb-4">
-      <label class="text-[0.55rem] tracking-[0.15em] text-[#455a64] font-bold uppercase block mb-1.5">Target URL</label>
+      <label class="text-[0.6rem] tracking-[0.2em] text-[#78909c] font-bold uppercase block mb-1.5">Target URL</label>
       <input type="text" id="urlInput" 
              class="tech-input" 
              placeholder="https://example.com" value="https://">
     </div>
 
-    <!-- advanced toggle -->
+    <!-- advanced toggle (glass) -->
     <div class="glass-card flex items-center justify-between mb-4">
       <div>
-        <p class="text-sm font-bold text-[#78909c] tracking-wide">Advanced Mode</p>
-        <p class="text-[0.5rem] text-[#455a64] italic">client‑side render · bypass 403</p>
+        <p class="text-sm font-bold text-[#e8f5e9] tracking-wide">Advanced Mode</p>
+        <p class="text-[0.55rem] text-[#78909c] italic">client‑side render · bypass 403</p>
       </div>
       <label class="relative flex items-center">
         <input type="checkbox" id="advancedMode" class="toggle-checkbox">
@@ -283,8 +295,8 @@
     <!-- API endpoint -->
     <div class="glass-card mb-5">
       <div class="flex justify-between items-center mb-1.5">
-        <span class="text-[0.5rem] font-bold text-[#455a64] tracking-widest">SYSTEM API</span>
-        <span class="text-[0.45rem] bg-[rgba(255,255,255,0.02)] text-[#546e7a] px-2 py-0.5 rounded-full border border-[rgba(255,255,255,0.025)]">GET</span>
+        <span class="text-[0.55rem] font-bold text-[#78909c] tracking-widest">SYSTEM API</span>
+        <span class="text-[0.5rem] bg-[rgba(0,230,118,0.1)] text-[#00e676] px-2 py-0.5 rounded-full font-bold border border-[rgba(0,230,118,0.1)]">GET</span>
       </div>
       <div class="code-block select-all">
         /api/convert?url=<span>{TARGET_URL}</span>
@@ -298,15 +310,15 @@
 
     <!-- log -->
     <div id="sysLog" class="status-box mt-5 hidden">
-      <div id="logContent" class="text-[0.65rem] space-y-1 max-h-32 overflow-y-auto">
-        <p class="text-[#546e7a]">> Initializing scraper...</p>
+      <div id="logContent" class="text-[0.7rem] space-y-1 max-h-36 overflow-y-auto">
+        <p class="text-[#78909c]">> Initializing scraper...</p>
       </div>
     </div>
 
-    <!-- footer -->
+    <!-- footer: proudly made by Caseyrhodes Tech -->
     <div class="footer-brand">
       <span>✦ <strong>Powered by Caseyrhodes Tech</strong> ✦</span>
-      <span class="text-[0.45rem] bg-[rgba(255,255,255,0.015)] px-3 py-1 rounded-full text-[#455a64] border border-[rgba(255,255,255,0.02)]">READY</span>
+      <span class="text-[0.5rem] bg-[rgba(255,255,255,0.02)] px-3 py-1 rounded-full text-[#78909c] border border-[rgba(255,255,255,0.04)]">READY</span>
     </div>
   </div>
 
@@ -314,13 +326,13 @@
   <iframe id="renderFrame" style="display:none;"></iframe>
 
   <script>
-    // ——— animated lines (very subtle, dark) ———
+    // ——— animated lines (dark, subtle) ———
     (function initLines() {
       const canvas = document.getElementById('lines-canvas');
       const ctx = canvas.getContext('2d');
       let w, h;
       const lines = [];
-      const LINE_COUNT = 18;
+      const LINE_COUNT = 22;
 
       function resize() {
         w = canvas.width = window.innerWidth;
@@ -338,11 +350,11 @@
           this.y1 = Math.random() * h;
           this.x2 = Math.random() * w;
           this.y2 = Math.random() * h;
-          this.speed = 0.08 + Math.random() * 0.12;
+          this.speed = 0.12 + Math.random() * 0.2;
           this.angle = Math.random() * Math.PI * 2;
-          this.length = 40 + Math.random() * 80;
-          this.opacity = 0.01 + Math.random() * 0.025;
-          this.color = `rgba(255, 255, 255, ${this.opacity})`;
+          this.length = 50 + Math.random() * 120;
+          this.opacity = 0.02 + Math.random() * 0.06;
+          this.color = `rgba(0, 230, 118, ${this.opacity})`;
           this.dx = Math.cos(this.angle) * this.speed;
           this.dy = Math.sin(this.angle) * this.speed;
         }
@@ -368,7 +380,7 @@
           ctx.moveTo(this.x1, this.y1);
           ctx.lineTo(this.x2, this.y2);
           ctx.strokeStyle = this.color;
-          ctx.lineWidth = 0.8;
+          ctx.lineWidth = 1.2;
           ctx.stroke();
         }
       }
@@ -383,13 +395,20 @@
           line.update();
           line.draw();
         }
+        // extra subtle glow
+        ctx.shadowColor = 'rgba(0, 230, 118, 0.02)';
+        ctx.shadowBlur = 12;
+        for (let line of lines) {
+          line.draw();
+        }
+        ctx.shadowBlur = 0;
         requestAnimationFrame(drawLines);
       }
       drawLines();
     })();
 
     // ——— scraper logic (unchanged) ———
-    const log = (msg, color = "#546e7a") => {
+    const log = (msg, color = "#78909c") => {
       const container = document.getElementById('logContent');
       const p = document.createElement('p');
       p.style.color = color;
@@ -419,7 +438,7 @@
       if (isAdvanced) {
         await executeUserSideExtraction(url);
       } else {
-        log('Executing server‑side scrape ...', '#455a64');
+        log('Executing server‑side scrape ...', '#00bcd4');
         window.location.href = `/api/convert?url=${encodeURIComponent(url)}`;
         setTimeout(() => {
           btn.innerText = originalText;
@@ -434,26 +453,26 @@
 
     async function executeUserSideExtraction(targetUrl) {
       try {
-        log('Engaging client‑side render engine ...', '#455a64');
+        log('Engaging client‑side render engine ...', '#00bcd4');
         const zip = new JSZip();
 
-        log('Fetching via stealth proxy ...', '#455a64');
+        log('Fetching via stealth proxy ...', '#00bcd4');
         const proxyUrl = `/api/proxy?url=${encodeURIComponent(targetUrl)}`;
         const response = await fetch(proxyUrl);
         if (!response.ok) throw new Error(`Server block (${response.status})`);
         const html = await response.text();
 
-        log('Injecting render frame ...', '#455a64');
+        log('Injecting render frame ...', '#00bcd4');
         const frame = document.getElementById('renderFrame');
         const frameDoc = frame.contentDocument || frame.contentWindow.document;
         frameDoc.open();
         frameDoc.write(html);
         frameDoc.close();
 
-        log('Waiting for React hydration (8s) ...', '#455a64');
+        log('Waiting for React hydration (8s) ...', '#00bcd4');
         await new Promise(r => setTimeout(r, 8000));
 
-        log('Capturing hydrated DOM ...', '#455a64');
+        log('Capturing hydrated DOM ...', '#00bcd4');
         const renderedDoc = frameDoc.cloneNode(true);
         const assets = [];
 
@@ -477,7 +496,7 @@
 
         zip.file("index.html", renderedDoc.documentElement.outerHTML);
 
-        log(`Downloading assets (${assets.length}) ...`, '#455a64');
+        log(`Downloading assets (${assets.length}) ...`, '#00bcd4');
         for (const asset of assets) {
           try {
             const res = await fetch(`/api/proxy?url=${encodeURIComponent(asset.url)}`);
@@ -488,7 +507,7 @@
           } catch (e) {}
         }
 
-        log('Packing ZIP archive ...', '#546e7a');
+        log('Packing ZIP archive ...', '#78909c');
         const content = await zip.generateAsync({ type: "blob" });
         const zipName = new URL(targetUrl).hostname.replace(/\./g, '_') + '_advanced.zip';
 
@@ -497,9 +516,9 @@
         link.download = zipName;
         link.click();
 
-        log('✅ Extraction complete!', '#78909c');
+        log('✅ Extraction complete!', '#00e676');
       } catch (err) {
-        log(`❌ FAILED: ${err.message}`, '#6d4c41');
+        log(`❌ FAILED: ${err.message}`, '#ff6b6b');
       }
     }
   </script>
