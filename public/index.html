@@ -1,248 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web2Zip | Cyber Protocol</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            background-color: #0d0d12;
-            background-image: 
-                linear-gradient(rgba(0, 255, 136, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 255, 136, 0.03) 1px, transparent 1px);
-            background-size: 30px 30px;
-            font-family: 'JetBrains Mono', monospace;
-            color: #00ff88;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow-y: auto; 
-            padding: 20px;
-        }
-
-        .anime-border {
-            border: 2px solid #00ff88;
-            box-shadow: 5px 5px 0px #7000ff;
-            clip-path: polygon(0% 0%, 100% 0%, 100% 95%, 95% 100%, 0% 100%);
-        }
-
-        .tech-input {
-            background: rgba(0, 0, 0, 0.7);
-            border: 1px solid #7000ff;
-            color: #fff;
-            outline: none;
-            transition: 0.3s;
-        }
-
-        .tech-input:focus {
-            border-color: #00ff88;
-            box-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
-        }
-
-        .btn-execute {
-            background: #00ff88;
-            color: #000;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            transition: 0.2s;
-            cursor: pointer;
-        }
-
-        .btn-execute:hover {
-            background: #7000ff;
-            color: #fff;
-            box-shadow: 0 0 20px #7000ff;
-        }
-
-        .glitch-text {
-            text-transform: uppercase;
-            position: relative;
-            display: inline-block;
-        }
-
-        .status-box {
-            border-left: 3px solid #7000ff;
-            background: rgba(112, 0, 255, 0.05);
-        }
-    </style>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Web2Zip | Secure Access</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+body{background:#0d0d12;background-image:linear-gradient(rgba(0,255,136,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,136,.03) 1px,transparent 1px);background-size:30px 30px;font-family:'JetBrains Mono',monospace;color:#00ff88;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}.anime-border{border:2px solid #00ff88;box-shadow:5px 5px 0 #7000ff;clip-path:polygon(0 0,100% 0,100% 95%,95% 100%,0 100%)}.tech-input{background:rgba(0,0,0,.7);border:1px solid #7000ff;color:#fff;outline:none}.tech-input:focus{border-color:#00ff88;box-shadow:0 0 10px rgba(0,255,136,.2)}.btn{font-weight:800;text-transform:uppercase;letter-spacing:2px;transition:.2s;cursor:pointer}.btn-green{background:#00ff88;color:#000}.btn-green:hover{background:#7000ff;color:#fff}.btn-purple{background:#7000ff;color:#fff}.btn-purple:hover{background:#00ff88;color:#000}.hiddenx{display:none!important}.status{border-left:3px solid #7000ff;background:rgba(112,0,255,.05)}
+</style>
 </head>
 <body>
-    <button onclick="logout()" class="fixed top-4 right-4 text-[10px] border border-purple-700 px-3 py-2 text-white bg-black/60">LOGOUT</button>
+<div class="anime-border bg-[#16161e] w-full max-w-lg p-8 relative">
+<div class="absolute top-2 right-4 text-[10px] opacity-50">VER 5.2.0 // SECURE_LOGIN</div>
 
-    <div class="anime-border bg-[#16161e] w-full max-w-lg p-8 relative">
-        <div class="absolute top-2 right-4 text-[10px] opacity-50">VER 5.1.0 // HYBRID_RESTORED</div>
-        
-        <div class="mb-8">
-            <h1 class="text-4xl font-black glitch-text tracking-tighter">
-                SCRAPE <span class="text-[#7000ff]">PROTOCOL</span>
-            </h1>
-            <div class="h-1 w-20 bg-[#7000ff] mt-1"></div>
-        </div>
+<section id="loginView">
+<h1 class="text-4xl font-black tracking-tighter">WEB2<span class="text-[#7000ff]">ZIP</span></h1>
+<div class="h-1 w-20 bg-[#7000ff] mt-1 mb-8"></div>
+<p class="text-[10px] mb-2 text-purple-400 font-bold tracking-widest">SECURE ACCESS</p>
+<div class="space-y-4">
+<input id="email" type="email" autocomplete="email" class="tech-input w-full p-4 rounded-sm" placeholder="EMAIL">
+<input id="password" type="password" autocomplete="current-password" class="tech-input w-full p-4 rounded-sm" placeholder="PASSWORD">
+<button id="loginBtn" onclick="login()" class="btn btn-green w-full p-4">Login with Email</button>
+<div class="grid grid-cols-2 gap-3">
+<button onclick="oauth('google')" class="btn btn-purple p-3">Google</button>
+<button onclick="oauth('github')" class="btn btn-purple p-3">GitHub</button>
+</div>
+<p class="text-[9px] text-gray-500">Demo login defaults: admin@example.com / ChangeMe123! — change these in Render environment variables.</p>
+<div id="loginError" class="text-red-400 text-[10px] hiddenx"></div>
+</div>
+</section>
 
-        <div class="space-y-6">
-            <div>
-                <p class="text-[10px] mb-2 text-purple-400 font-bold tracking-widest">INPUT_TARGET_URL</p>
-                <input type="text" id="urlInput" 
-                    class="tech-input w-full p-4 rounded-sm font-bold italic"
-                    placeholder="HTTP://SOURCE_LINK.COM" value="https://">
-            </div>
-
-            <div class="flex items-center justify-between p-4 bg-black/40 border border-purple-900/30 rounded">
-                <div>
-                    <p class="text-[11px] font-bold text-white uppercase tracking-widest">Advanced Mode</p>
-                    <p class="text-[9px] text-gray-500 italic">Automated User-Side Rendering (Bypasses 403/React).</p>
-                </div>
-                <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" id="advancedMode" class="sr-only peer">
-                    <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#7000ff] shadow-[0_0_10px_rgba(112,0,255,0.4)]"></div>
-                </label>
-            </div>
-
-            <div class="p-4 bg-black/40 border border-[#00ff88]/30 rounded">
-                <div class="flex justify-between items-center mb-2">
-                    <p class="text-[10px] font-bold text-[#00ff88] uppercase tracking-widest">System API Endpoint</p>
-                    <span class="text-[8px] bg-[#00ff88] text-black px-1.5 py-0.5 rounded-sm font-bold">GET</span>
-                </div>
-                <code class="block text-[10px] text-gray-400 break-all p-2 bg-black border border-[#7000ff]/30 rounded select-all selection:bg-[#7000ff] selection:text-white">
-                    /api/convert?url={<span class="text-white">TARGET_URL</span>}
-                </code>
-            </div>
-            <button onclick="runScraper()" id="runBtn" class="btn-execute w-full p-5 italic">
-                Execute Extraction
-            </button>
-        </div>
-
-        <div id="sysLog" class="mt-8 status-box p-4 hidden">
-            <div class="text-[11px] space-y-1" id="logContent">
-                <p>> Initializing Scraper...</p>
-            </div>
-        </div>
-
-        <div class="mt-10 pt-6 border-t border-gray-800 flex justify-between items-end">
-            <div>
-                <p class="text-[9px] text-gray-500 uppercase">Tech Authority</p>
-                <p class="text-xs font-bold text-white tracking-widest">LORD INDUMINA</p>
-            </div>
-            <div class="text-[10px] bg-[#7000ff] text-white px-2 py-1">SECURE ACCESS</div>
-        </div>
-    </div>
-
-    <iframe id="renderFrame" style="display:none;"></iframe>
-
-    <script>
-        async function logout(){ await fetch('/api/logout',{method:'POST'}); location.href='/login'; }
-
-        const log = (msg, color = "#00ff88") => {
-            const p = document.createElement('p');
-            p.style.color = color;
-            p.innerText = `> ${msg}`;
-            const container = document.getElementById('logContent');
-            container.appendChild(p);
-            container.scrollTop = container.scrollHeight;
-        };
-
-        async function runScraper() {
-            const url = document.getElementById('urlInput').value;
-            const isAdvanced = document.getElementById('advancedMode').checked;
-            if (!url || url === 'https://') return alert('ERROR: URL_REQUIRED');
-
-            document.getElementById('sysLog').classList.remove('hidden');
-            document.getElementById('logContent').innerHTML = "";
-            log("Initializing Protocol...");
-            
-            const btn = document.getElementById('runBtn');
-            btn.innerText = "RUNNING...";
-            btn.disabled = true;
-
-            if (isAdvanced) {
-                await executeUserSideExtraction(url);
-                btn.innerText = "Execute Extraction";
-                btn.disabled = false;
-            } else {
-                log("Executing Server-Side Scrape...");
-                window.location.href = `/api/convert?url=${encodeURIComponent(url)}`;
-                setTimeout(() => {
-                    btn.innerText = "Execute Extraction";
-                    btn.disabled = false;
-                }, 5000);
-            }
-        }
-
-        async function executeUserSideExtraction(targetUrl) {
-            try {
-                log("Engaging User-Side Rendering Engine...", "#7000ff");
-                const zip = new JSZip();
-                
-                log("Fetching Raw Code via Stealth Proxy...");
-                const proxyUrl = `/api/proxy?url=${encodeURIComponent(targetUrl)}`;
-                const response = await fetch(proxyUrl);
-                if (!response.ok) throw new Error("Server Blocked (403)");
-                const html = await response.text();
-
-                log("Injecting Render Chamber...");
-                const frame = document.getElementById('renderFrame');
-                const frameDoc = frame.contentDocument || frame.contentWindow.document;
-                frameDoc.open();
-                frameDoc.write(html);
-                frameDoc.close();
-
-                log("Waiting for React Hydration (8s)...");
-                await new Promise(r => setTimeout(r, 8000));
-
-                log("Capturing Hydrated DOM...");
-                const renderedDoc = frameDoc.cloneNode(true);
-                const assets = [];
-                
-                const process = (selector, attr, folder) => {
-                    renderedDoc.querySelectorAll(selector).forEach((el, i) => {
-                        const src = el.getAttribute(attr);
-                        if (src && !src.startsWith('data:') && !src.startsWith('#')) {
-                            try {
-                                const absUrl = new URL(src, targetUrl).href;
-                                const fileName = `file-${i}.${folder}`;
-                                assets.push({ url: absUrl, path: `${folder}/${fileName}` });
-                                el.setAttribute(attr, `./${folder}/${fileName}`);
-                            } catch (e) {}
-                        }
-                    });
-                };
-
-                process('link[rel="stylesheet"]', 'href', 'css');
-                process('script[src]', 'src', 'js');
-                process('img', 'src', 'img');
-
-                zip.file("index.html", renderedDoc.documentElement.outerHTML);
-
-                log(`Downloading Assets (${assets.length})...`);
-                for (const asset of assets) {
-                    try {
-                        const res = await fetch(`/api/proxy?url=${encodeURIComponent(asset.url)}`);
-                        if (res.ok) {
-                            const blob = await res.blob();
-                            zip.file(asset.path, blob);
-                        }
-                    } catch (e) {}
-                }
-
-                log("Packaging Final ZIP...", "#00ff88");
-                const content = await zip.generateAsync({ type: "blob" });
-                const zipName = new URL(targetUrl).hostname.replace(/\./g, '_') + "_advanced.zip";
-                
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(content);
-                link.download = zipName;
-                link.click();
-
-                log("COMPLETE!", "#00ff88");
-            } catch (err) {
-                log(`FAILED: ${err.message}`, "red");
-            }
-        }
-    </script>
-</body>
-</html>
+<section id="appView" class="hiddenx">
+<div class="flex justify-between items-start mb-8"><div><h1 class="text-4xl font-black tracking-tighter">SCRAPE <span class="text-[#7000ff]">PROTOCOL</span></h1><div class="h-1 w-20 bg-[#7000ff] mt-1"></div></div><button onclick="logout()" class="text-[9px] border border-gray-700 px-2 py-1 text-gray-400">LOGOUT</button></div>
+<p id="userLabel" class="text-[9px] text-gray-500 mb-5"></p>
+<div class="space-y-6">
+<div><p class="text-[10px] mb-2 text-purple-400 font-bold tracking-widest">INPUT_TARGET_URL</p><input id="urlInput" type="text" class="tech-input w-full p-4 rounded-sm font-bold italic" placeholder="HTTPS://SOURCE-LINK.COM"></div>
+<div class="flex items-center justify-between p-4 bg-black/40 border border-purple-900/30 rounded"><div><p class="text-[11px] font-bold text-white uppercase tracking-widest">Advanced Mode</p><p class="text-[9px] text-gray-500 italic">Automated User-Side Rendering.</p></div><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="advancedMode" class="sr-only peer"><div class="w-11 h-6 bg-gray-700 rounded-full peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#7000ff]"></div></label></div>
+<button onclick="runScraper()" id="runBtn" class="btn btn-green w-full p-5 italic">Execute Extraction</button>
+</div>
+<div id="sysLog" class="mt-8 status p-4 hiddenx"><div class="text-[11px] space-y-1" id="logContent"></div></div>
+</section>
+<iframe id="renderFrame" style="display:none"></iframe>
+</div>
+<script>
+const $=id=>document.getElementById(id);const tokenKey='web2zip_token';
+function log(msg,color='#00ff88'){const p=document.createElement('p');p.style.color=color;p.innerText='> '+msg;$('logContent').appendChild(p)}
+async function login(){const email=$('email').value.trim(),password=$('password').value; $('loginError').classList.add('hiddenx');try{const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})});const d=await r.json();if(!r.ok)throw new Error(d.error||'LOGIN_FAILED');localStorage.setItem(tokenKey,d.token);showApp(d.email)}catch(e){$('loginError').innerText=e.message;$('loginError').classList.remove('hiddenx')}}
+function showApp(email){$('loginView').classList.add('hiddenx');$('appView').classList.remove('hiddenx');$('userLabel').innerText='AUTHENTICATED: '+email}
+function logout(){localStorage.removeItem(tokenKey);location.reload()}
+async function oauth(provider){const r=await fetch('/api/oauth/'+provider);const d=await r.json();alert(d.message||'OAuth is not configured yet.')}
+async function authFetch(url,opts={}){opts.headers={...(opts.headers||{}),Authorization:'Bearer '+localStorage.getItem(tokenKey)};const r=await fetch(url,opts);if(r.status===401){logout();throw new Error('LOGIN_REQUIRED')}return r}
+async function runScraper(){const url=$('urlInput').value.trim(),advanced=$('advancedMode').checked;if(!url)return alert('ERROR: URL_REQUIRED');$('sysLog').classList.remove('hiddenx');$('logContent').innerHTML='';$('runBtn').disabled=true;log('Initializing Protocol...');try{if(advanced){await advancedExtract(url)}else{log('Executing Server-Side Scrape...');const r=await authFetch('/api/convert?url='+encodeURIComponent(url));if(!r.ok)throw new Error('Extraction failed');const blob=await r.blob();downloadBlob(blob,new URL(url).hostname.replace(/\./g,'_')+'.zip');log('COMPLETE!')}}catch(e){log('FAILED: '+e.message,'red')}finally{$('runBtn').disabled=false}}
+async function advancedExtract(target){log('Fetching Raw Code...','#7000ff');const r=await authFetch('/api/proxy?url='+encodeURIComponent(target));if(!r.ok)throw new Error('Proxy request failed');const html=await r.text();const frame=$('renderFrame'),doc=frame.contentDocument||frame.contentWindow.document;doc.open();doc.write(html);doc.close();log('Waiting for rendering...');await new Promise(x=>setTimeout(x,3000));const zip=new JSZip(),rendered=doc.documentElement.cloneNode(true),assets=[];function process(sel,attr,folder){rendered.querySelectorAll(sel).forEach((el,i)=>{const src=el.getAttribute(attr);if(src&&!src.startsWith('data:')&&!src.startsWith('#'))try{const u=new URL(src,target).href,n='file-'+i+'.'+folder;assets.push({url:u,path:folder+'/'+n});el.setAttribute(attr,'./'+folder+'/'+n)}catch(_){}})}process('link[rel="stylesheet"]','href','css');process('script[src]','src','js');process('img','src','img');zip.file('index.html',rendered.outerHTML);log('Downloading '+assets.length+' assets...');for(const a of assets){try{const x=await authFetch('/api/proxy?url='+encodeURIComponent(a.url));if(x.ok)zip.file(a.path,await x.blob())}catch(_){}}const blob=await zip.generateAsync({type:'blob'});downloadBlob(blob,new URL(target).hostname.replace(/\./g,'_')+'_advanced.zip');log('COMPLETE!')}
+function downloadBlob(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+(function(){const t=localStorage.getItem(tokenKey);if(!t)return;fetch('/api/me',{headers:{Authorization:'Bearer '+t}}).then(r=>r.ok?r.json():Promise.reject()).then(d=>showApp(d.email)).catch(()=>localStorage.removeItem(tokenKey))})();
+</script>
+</body></html>
