@@ -9,11 +9,3 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
-      - key: DEMO_EMAIL
-        sync: false
-      - key: DEMO_PASSWORD
-        sync: false
-      - key: SESSION_SECRET
-        generateValue: true
-      - key: APP_URL
-        sync: false
