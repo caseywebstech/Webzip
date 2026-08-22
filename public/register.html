@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Web2Zip | Create Account</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>body{background:#0d0d12;color:#00ff88;font-family:monospace;background-image:linear-gradient(rgba(0,255,136,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,136,.03) 1px,transparent 1px);background-size:30px 30px}.box{border:2px solid #00ff88;box-shadow:6px 6px 0 #7000ff}.input{background:#050509;border:1px solid #7000ff;color:#fff}.input:focus{border-color:#00ff88;outline:none}.btn{background:#00ff88;color:#000}.oauth{border:1px solid #333;color:#fff}.oauth:hover{border-color:#00ff88}</style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-5">
+<div class="box bg-[#16161e] w-full max-w-md p-7">
+<p class="text-[10px] opacity-50 text-right">WEB2ZIP // NEW USER</p>
+<h1 class="text-3xl font-bold mt-4">CREATE <span class="text-[#7000ff]">ACCOUNT</span></h1>
+<p class="text-xs text-gray-500 mt-2">Register first, then use your account to access Web2Zip.</p>
+<div id="message" class="hidden mt-5 p-3 border border-red-700 text-red-400 text-xs"></div>
+<form id="registerForm" class="mt-6 space-y-4">
+<label class="block text-xs">NAME<input id="name" type="text" required minlength="2" autocomplete="name" class="input w-full p-3 mt-2" placeholder="Your name"></label>
+<label class="block text-xs">EMAIL<input id="email" type="email" required autocomplete="email" class="input w-full p-3 mt-2" placeholder="you@example.com"></label>
+<label class="block text-xs">PASSWORD<input id="password" type="password" required minlength="8" autocomplete="new-password" class="input w-full p-3 mt-2" placeholder="At least 8 characters"></label>
+<label class="block text-xs">CONFIRM PASSWORD<input id="confirm" type="password" required minlength="8" autocomplete="new-password" class="input w-full p-3 mt-2" placeholder="Repeat your password"></label>
+<button id="submit" class="btn w-full p-4 font-bold tracking-widest" type="submit">CREATE ACCOUNT</button>
+</form>
+<div class="flex items-center gap-3 my-6"><div class="h-px bg-gray-800 flex-1"></div><span class="text-[10px] text-gray-600">OR</span><div class="h-px bg-gray-800 flex-1"></div></div>
+<div class="grid grid-cols-2 gap-3"><a class="oauth p-3 text-center text-xs" href="/auth/google">Google</a><a class="oauth p-3 text-center text-xs" href="/auth/github">GitHub</a></div>
+<p class="text-xs text-gray-500 mt-6 text-center">Already have an account? <a href="/login" class="text-[#00ff88]">Sign in</a></p>
+</div>
+<script>
+const form=document.getElementById('registerForm'),msg=document.getElementById('message'),btn=document.getElementById('submit');
+function show(t,ok=false){msg.textContent=t;msg.className='mt-5 p-3 border text-xs '+(ok?'border-green-700 text-green-400':'border-red-700 text-red-400');}
+form.addEventListener('submit',async e=>{e.preventDefault();msg.classList.add('hidden');if(password.value!==confirm.value)return show('Passwords do not match.');btn.disabled=true;btn.textContent='CREATING...';try{const r=await fetch('/api/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:name.value,email:email.value,password:password.value})});const d=await r.json();if(!r.ok)throw new Error(d.error||'Registration failed');location.href=d.redirect||'/';}catch(err){show(err.message);}finally{btn.disabled=false;btn.textContent='CREATE ACCOUNT';}});
+</script>
+</body></html>
