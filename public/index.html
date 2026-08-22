@@ -1,422 +1,524 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web2Zip | Cyber Protocol</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            background-color: #0d0d12;
-            background-image: 
-                linear-gradient(rgba(0, 255, 136, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 255, 136, 0.03) 1px, transparent 1px);
-            background-size: 30px 30px;
-            font-family: 'JetBrains Mono', monospace;
-            color: #00ff88;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow-y: auto;
-            padding: 20px;
-            position: relative;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Caseyrhodes · Cyber Protocol</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ——— reset & base ——— */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        .anime-border {
-            border: 2px solid #00ff88;
-            box-shadow: 5px 5px 0px #7000ff;
-            border-radius: 24px;
-            overflow: hidden;
-        }
+    body {
+      background: #0b0d17;
+      font-family: 'JetBrains Mono', monospace;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      margin: 0;
+      position: relative;
+      overflow-x: hidden;
+    }
 
-        .glass-panel {
-            border-radius: 16px;
-        }
+    /* ——— black‑blue particle canvas ——— */
+    #particle-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+      background: transparent;
+    }
 
-        .hexagon-field {
-            position: fixed;
-            inset: 0;
-            overflow: hidden;
-            pointer-events: none;
-            z-index: 0;
-        }
+    /* ——— main card ——— */
+    .cyber-card {
+      position: relative;
+      z-index: 10;
+      background: #11141f;
+      backdrop-filter: blur(2px);
+      width: 100%;
+      max-width: 540px;
+      padding: 2rem 2rem 1.8rem;
+      border-radius: 2.5rem 1rem 2.5rem 1rem;
+      box-shadow: 0 20px 40px -12px rgba(0, 10, 30, 0.8);
+      border: 1px solid rgba(40, 80, 180, 0.25);
+      transition: all 0.2s;
+    }
 
-        .hexagon {
-            position: absolute;
-            width: 72px;
-            height: 42px;
-            border: 1px solid rgba(0, 255, 136, 0.18);
-            background: rgba(0, 255, 136, 0.025);
-            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
-            filter: drop-shadow(0 0 7px rgba(0, 255, 136, 0.08));
-            animation: hexFloat linear infinite;
-        }
+    /* profile picture – centre top */
+    .profile-wrapper {
+      display: flex;
+      justify-content: center;
+      margin-top: -3.8rem;
+      margin-bottom: 1.2rem;
+    }
+    .profile-pic {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0b1a30, #1b2f4a);
+      border: 3px solid #3b6fbb;
+      box-shadow: 0 0 0 4px rgba(20, 60, 140, 0.3), 0 0 30px rgba(30, 90, 200, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.8rem;
+      font-weight: 800;
+      color: #b0d0ff;
+      letter-spacing: 2px;
+      background-image: radial-gradient(circle at 30% 30%, #2b5a9a, #0c1e3a);
+      user-select: none;
+      transition: 0.25s;
+    }
+    .profile-pic:hover {
+      transform: scale(1.02);
+      border-color: #6b9cff;
+      box-shadow: 0 0 0 6px rgba(50, 120, 255, 0.2);
+    }
 
-        .hexagon:nth-child(3n) { border-color: rgba(112, 0, 255, 0.22); }
-        .hexagon:nth-child(4n) { width: 52px; height: 30px; animation-duration: 17s; }
-        .hexagon:nth-child(5n) { width: 94px; height: 54px; animation-duration: 25s; }
+    /* ——— title ——— */
+    .brand-title {
+      font-size: 1.9rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(to right, #c8e0ff, #7aa7ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 0 20px rgba(60, 130, 255, 0.15);
+      line-height: 1.2;
+    }
+    .brand-sub {
+      font-size: 0.7rem;
+      letter-spacing: 3px;
+      color: #6889c0;
+      border-left: 3px solid #2f5f9e;
+      padding-left: 12px;
+      margin-top: 4px;
+    }
 
-        @keyframes hexFloat {
-            0% { transform: translate3d(-12vw, 110vh, 0) rotate(0deg); opacity: 0; }
-            10% { opacity: .75; }
-            50% { transform: translate3d(48vw, 42vh, 0) rotate(180deg); opacity: .45; }
-            90% { opacity: .7; }
-            100% { transform: translate3d(112vw, -15vh, 0) rotate(360deg); opacity: 0; }
-        }
+    /* ——— inputs & elements ——— */
+    .tech-input {
+      background: rgba(8, 16, 32, 0.8);
+      border: 1px solid #263b60;
+      color: #e4f0ff;
+      border-radius: 14px;
+      padding: 0.9rem 1.2rem;
+      width: 100%;
+      font-size: 0.9rem;
+      font-weight: 400;
+      outline: none;
+      transition: 0.25s;
+      backdrop-filter: blur(2px);
+    }
+    .tech-input:focus {
+      border-color: #4f87e6;
+      box-shadow: 0 0 0 3px rgba(60, 130, 255, 0.15);
+      background: rgba(12, 22, 44, 0.9);
+    }
+    .tech-input::placeholder {
+      color: #4a6590;
+      font-weight: 300;
+      letter-spacing: 0.5px;
+    }
 
-        .content-layer { position: relative; z-index: 1; }
+    .btn-execute {
+      background: #1a3a6e;
+      border: none;
+      border-radius: 40px;
+      padding: 1rem 1.5rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: #eaf3ff;
+      text-transform: uppercase;
+      font-size: 0.9rem;
+      transition: 0.25s;
+      cursor: pointer;
+      box-shadow: 0 6px 0 #0b1a32, 0 8px 20px rgba(20, 60, 160, 0.2);
+      width: 100%;
+      backdrop-filter: blur(2px);
+      border: 1px solid #2f5590;
+    }
+    .btn-execute:hover {
+      background: #214a86;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 0 #0b1a32, 0 12px 30px rgba(30, 80, 200, 0.3);
+    }
+    .btn-execute:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 #0b1a32;
+    }
 
-        .tech-input {
-            background: rgba(0, 0, 0, 0.7);
-            border: 1px solid #7000ff;
-            color: #fff;
-            outline: none;
-            transition: 0.3s;
-        }
+    .status-box {
+      background: rgba(10, 22, 44, 0.6);
+      border-left: 4px solid #3d78d4;
+      border-radius: 12px;
+      padding: 0.8rem 1rem;
+      backdrop-filter: blur(2px);
+    }
 
-        .tech-input:focus {
-            border-color: #00ff88;
-            box-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
-        }
+    .badge-soft {
+      background: rgba(30, 80, 180, 0.15);
+      color: #89b0f0;
+      border: 1px solid #2a4a7a;
+      border-radius: 40px;
+      padding: 0.2rem 1rem;
+      font-size: 0.65rem;
+      letter-spacing: 1px;
+      font-weight: 700;
+    }
 
-        .btn-execute {
-            background: #00ff88;
-            color: #000;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            transition: 0.2s;
-            cursor: pointer;
-        }
+    /* toggle switch (black‑blue) */
+    .toggle-checkbox:checked + .toggle-slider {
+      background: #2355a8;
+      box-shadow: 0 0 15px #2355a8;
+    }
+    .toggle-slider {
+      background: #1c2d4a;
+      transition: 0.25s;
+      border-radius: 999px;
+      width: 44px;
+      height: 24px;
+      position: relative;
+      cursor: pointer;
+    }
+    .toggle-slider::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 18px;
+      height: 18px;
+      background: #b8d4ff;
+      border-radius: 50%;
+      transition: 0.25s;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+    }
+    .toggle-checkbox:checked + .toggle-slider::after {
+      transform: translateX(20px);
+      background: #dbeafe;
+    }
+    .toggle-checkbox {
+      display: none;
+    }
 
-        .btn-execute:hover {
-            background: #7000ff;
-            color: #fff;
-            box-shadow: 0 0 20px #7000ff;
-        }
+    /* ——— code block ——— */
+    .code-block {
+      background: #0b1424;
+      border: 1px solid #223d66;
+      border-radius: 14px;
+      padding: 0.6rem 0.9rem;
+      font-size: 0.65rem;
+      color: #8bb0f0;
+      word-break: break-all;
+      font-family: 'JetBrains Mono', monospace;
+    }
 
-        .glitch-text {
-            text-transform: uppercase;
-            position: relative;
-            display: inline-block;
-        }
+    /* ——— footer ——— */
+    .footer-brand {
+      font-size: 0.75rem;
+      letter-spacing: 0.5px;
+      color: #6e8fc0;
+      border-top: 1px solid #1f3450;
+      padding-top: 1.2rem;
+      margin-top: 0.6rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .footer-brand strong {
+      color: #b6d2ff;
+      font-weight: 700;
+      background: linear-gradient(to right, #7aa7ff, #b6d2ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
 
-        .status-box {
-            border-left: 3px solid #7000ff;
-            background: rgba(112, 0, 255, 0.05);
-        }
-    </style>
+    /* ——— utilities ——— */
+    .glow-text {
+      text-shadow: 0 0 12px rgba(60, 130, 255, 0.2);
+    }
+    .bg-particles-overlay {
+      background: radial-gradient(circle at 20% 30%, #0f1f3a, #070b14 80%);
+    }
+    /* remove any neon edge – no box-shadow with neon colors, no clip-path */
+  </style>
 </head>
 <body>
-    <div class="hexagon-field" aria-hidden="true" id="hexagonField"></div>
 
-    <div class="anime-border content-layer bg-[#16161e] w-full max-w-lg p-8 relative">
-        <div class="absolute top-2 right-4 text-[10px] opacity-50">VER 5.1.0 // HYBRID_RESTORED</div>
-        
-        <div class="mb-8">
-            <h1 class="text-4xl font-black glitch-text tracking-tighter">
-                SCRAPE <span class="text-[#7000ff]">PROTOCOL</span>
-            </h1>
-            <div class="h-1 w-20 bg-[#7000ff] mt-1"></div>
-        </div>
+  <!-- particle canvas (black‑blue particles) -->
+  <canvas id="particle-canvas"></canvas>
 
-        <div class="space-y-6">
-            <div>
-                <p class="text-[10px] mb-2 text-purple-400 font-bold tracking-widest">INPUT_TARGET_URL</p>
-                <input type="text" id="urlInput" 
-                    class="tech-input w-full p-4 rounded-xl font-bold italic"
-                    placeholder="HTTP://SOURCE_LINK.COM" value="https://">
-            </div>
+  <!-- main card -->
+  <div class="cyber-card">
 
-            <div class="flex items-center justify-between p-4 bg-black/40 border border-purple-900/30 rounded-2xl">
-                <div>
-                    <p class="text-[11px] font-bold text-white uppercase tracking-widest">Advanced Mode</p>
-                    <p class="text-[9px] text-gray-500 italic">Automated User-Side Rendering (Bypasses 403/React).</p>
-                </div>
-                <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" id="advancedMode" class="sr-only peer">
-                    <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#7000ff] shadow-[0_0_10px_rgba(112,0,255,0.4)]"></div>
-                </label>
-            </div>
-
-            <div class="p-4 bg-black/40 border border-[#00ff88]/30 rounded-2xl">
-                <div class="flex justify-between items-center mb-2">
-                    <p class="text-[10px] font-bold text-[#00ff88] uppercase tracking-widest">System API Endpoint</p>
-                    <span class="text-[8px] bg-[#00ff88] text-black px-1.5 py-0.5 rounded-sm font-bold">GET</span>
-                </div>
-                <code class="block text-[10px] text-gray-400 break-all p-2 bg-black border border-[#7000ff]/30 rounded-xl select-all selection:bg-[#7000ff] selection:text-white">
-                    /api/convert?url={<span class="text-white">TARGET_URL</span>}
-                </code>
-            </div>
-            <button onclick="runScraper()" id="runBtn" class="btn-execute w-full p-5 italic rounded-2xl">
-                Execute Extraction
-            </button>
-        </div>
-
-        <div id="resultBox" class="mt-6 p-4 bg-black/50 border border-[#00ff88]/40 rounded-2xl hidden">
-            <p class="text-[10px] font-bold text-[#00ff88] uppercase tracking-widest mb-3">DOWNLOAD / COPY OPTIONS</p>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <button id="downloadZipBtn" type="button" class="p-3 bg-[#00ff88] text-black font-bold text-[10px] uppercase tracking-wider rounded-xl hover:bg-white transition">
-                    Download ZIP
-                </button>
-                <button id="downloadCodeBtn" type="button" class="p-3 bg-[#7000ff] text-white font-bold text-[10px] uppercase tracking-wider rounded-xl hover:bg-white hover:text-black transition">
-                    Download Code
-                </button>
-                <button id="copyCodeBtn" type="button" class="p-3 bg-gray-800 text-white border border-gray-600 font-bold text-[10px] uppercase tracking-wider rounded-xl hover:border-[#00ff88] transition">
-                    Copy Code
-                </button>
-            </div>
-            <p id="copyStatus" class="text-[9px] text-gray-500 mt-3 hidden"></p>
-        </div>
-
-        <div id="sysLog" class="mt-8 status-box p-4 rounded-xl hidden">
-            <div class="text-[11px] space-y-1" id="logContent">
-                <p>> Initializing Scraper...</p>
-            </div>
-        </div>
-
-        <div class="mt-10 pt-6 border-t border-gray-800 flex justify-between items-end">
-            <div>
-                <p class="text-[9px] text-gray-500 uppercase">Tech Authority</p>
-                <p class="text-xs font-bold text-white tracking-widest">LORD INDUMINA</p>
-            </div>
-            <div class="text-[10px] bg-[#7000ff] text-white px-2 py-1 rounded-lg">READY</div>
-        </div>
+    <!-- profile picture (center) -->
+    <div class="profile-wrapper">
+      <div class="profile-pic" aria-label="profile picture">
+        <span>CR</span>
+      </div>
     </div>
 
-    <iframe id="renderFrame" style="display:none;"></iframe>
+    <!-- header -->
+    <div class="text-center mb-5">
+      <h1 class="brand-title">SCRAPE  PROTOCOL</h1>
+      <div class="brand-sub">⚡ HYBRID · RENDER  ⚡</div>
+    </div>
 
-    <script>
-        const log = (msg, color = "#00ff88") => {
-            const p = document.createElement('p');
-            p.style.color = color;
-            p.innerText = `> ${msg}`;
-            const container = document.getElementById('logContent');
-            container.appendChild(p);
-            container.scrollTop = container.scrollHeight;
+    <!-- url input -->
+    <div class="mb-4">
+      <label class="text-[0.6rem] tracking-[0.2em] text-[#5980bd] font-bold uppercase block mb-1.5">Target URL</label>
+      <input type="text" id="urlInput" 
+             class="tech-input" 
+             placeholder="https://example.com" value="https://">
+    </div>
+
+    <!-- advanced toggle (black‑blue) -->
+    <div class="flex items-center justify-between bg-[#0c162b] p-3 rounded-2xl border border-[#1e3760] mb-4">
+      <div>
+        <p class="text-sm font-bold text-[#b8d0f5] tracking-wide">Advanced Mode</p>
+        <p class="text-[0.55rem] text-[#5a7fa8] italic">client‑side render · bypass 403</p>
+      </div>
+      <label class="relative flex items-center">
+        <input type="checkbox" id="advancedMode" class="toggle-checkbox">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+
+    <!-- API endpoint -->
+    <div class="bg-[#0a1428] p-3 rounded-2xl border border-[#1e3760] mb-5">
+      <div class="flex justify-between items-center mb-1.5">
+        <span class="text-[0.55rem] font-bold text-[#5980bd] tracking-widest">SYSTEM API</span>
+        <span class="text-[0.5rem] bg-[#1a3a6e] text-[#b8d4ff] px-2 py-0.5 rounded-full font-bold">GET</span>
+      </div>
+      <div class="code-block select-all">
+        /api/convert?url=<span class="text-[#b8d4ff]">{TARGET_URL}</span>
+      </div>
+    </div>
+
+    <!-- execute button -->
+    <button onclick="runScraper()" id="runBtn" class="btn-execute">
+      ⚡ Execute Extraction
+    </button>
+
+    <!-- log -->
+    <div id="sysLog" class="status-box mt-5 hidden">
+      <div id="logContent" class="text-[0.7rem] space-y-1 max-h-36 overflow-y-auto">
+        <p class="text-[#92b7f0]">> Initializing scraper...</p>
+      </div>
+    </div>
+
+    <!-- footer: proudly made by Caseyrhodes Tech -->
+    <div class="footer-brand">
+      <span>✦ <strong>Proudly made by Caseyrhodes Tech</strong> ✦</span>
+      <span class="text-[0.5rem] bg-[#1c3050] px-3 py-1 rounded-full text-[#aac3f0] border border-[#2b4a7a]">READY</span>
+    </div>
+  </div>
+
+  <!-- hidden iframe for advanced rendering -->
+  <iframe id="renderFrame" style="display:none;"></iframe>
+
+  <script>
+    // ——— black‑blue particle system ———
+    (function initParticles() {
+      const canvas = document.getElementById('particle-canvas');
+      const ctx = canvas.getContext('2d');
+      let w, h;
+      const particles = [];
+      const COUNT = 110;
+
+      function resize() {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      class Particle {
+        constructor() { this.reset(); }
+        reset() {
+          this.x = Math.random() * w;
+          this.y = Math.random() * h;
+          this.size = Math.random() * 2.2 + 0.8;
+          this.speedX = (Math.random() - 0.5) * 0.25;
+          this.speedY = (Math.random() - 0.5) * 0.25;
+          this.opacity = Math.random() * 0.6 + 0.2;
+          this.color = `rgba(70, 140, 255, ${this.opacity})`;
+        }
+        update() {
+          this.x += this.speedX;
+          this.y += this.speedY;
+          if (this.x < 0 || this.x > w) this.speedX *= -1;
+          if (this.y < 0 || this.y > h) this.speedY *= -1;
+        }
+        draw() {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fillStyle = this.color;
+          ctx.fill();
+          // subtle glow
+          if (this.size > 1.6) {
+            ctx.shadowColor = 'rgba(40, 100, 220, 0.2)';
+            ctx.shadowBlur = 12;
+            ctx.fill();
+            ctx.shadowBlur = 0;
+          }
+        }
+      }
+
+      for (let i = 0; i < COUNT; i++) {
+        particles.push(new Particle());
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, w, h);
+        for (let p of particles) {
+          p.update();
+          p.draw();
+        }
+        // extra small connection lines (very subtle)
+        ctx.strokeStyle = 'rgba(50, 120, 220, 0.06)';
+        ctx.lineWidth = 0.5;
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const dist = Math.hypot(dx, dy);
+            if (dist < 100) {
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.stroke();
+            }
+          }
+        }
+        requestAnimationFrame(draw);
+      }
+      draw();
+    })();
+
+    // ——— scraper logic ———
+    const log = (msg, color = "#8bb8ff") => {
+      const container = document.getElementById('logContent');
+      const p = document.createElement('p');
+      p.style.color = color;
+      p.innerText = `> ${msg}`;
+      container.appendChild(p);
+      container.scrollTop = container.scrollHeight;
+    };
+
+    async function runScraper() {
+      const url = document.getElementById('urlInput').value.trim();
+      const isAdvanced = document.getElementById('advancedMode').checked;
+      if (!url || url === 'https://' || url === '') {
+        alert('ERROR: URL_REQUIRED');
+        return;
+      }
+
+      const logBox = document.getElementById('sysLog');
+      logBox.classList.remove('hidden');
+      document.getElementById('logContent').innerHTML = '';
+      log('Initializing protocol ...');
+
+      const btn = document.getElementById('runBtn');
+      const originalText = btn.innerText;
+      btn.innerText = '⚡ RUNNING ...';
+      btn.disabled = true;
+
+      if (isAdvanced) {
+        await executeUserSideExtraction(url);
+      } else {
+        log('Executing server‑side scrape ...', '#7aa7ff');
+        window.location.href = `/api/convert?url=${encodeURIComponent(url)}`;
+        // fallback: re-enable after 5s
+        setTimeout(() => {
+          btn.innerText = originalText;
+          btn.disabled = false;
+        }, 5000);
+        return;
+      }
+
+      btn.innerText = originalText;
+      btn.disabled = false;
+    }
+
+    async function executeUserSideExtraction(targetUrl) {
+      try {
+        log('Engaging client‑side render engine ...', '#5f8edb');
+        const zip = new JSZip();
+
+        log('Fetching via stealth proxy ...', '#5f8edb');
+        const proxyUrl = `/api/proxy?url=${encodeURIComponent(targetUrl)}`;
+        const response = await fetch(proxyUrl);
+        if (!response.ok) throw new Error(`Server block (${response.status})`);
+        const html = await response.text();
+
+        log('Injecting render frame ...', '#5f8edb');
+        const frame = document.getElementById('renderFrame');
+        const frameDoc = frame.contentDocument || frame.contentWindow.document;
+        frameDoc.open();
+        frameDoc.write(html);
+        frameDoc.close();
+
+        log('Waiting for React hydration (8s) ...', '#5f8edb');
+        await new Promise(r => setTimeout(r, 8000));
+
+        log('Capturing hydrated DOM ...', '#5f8edb');
+        const renderedDoc = frameDoc.cloneNode(true);
+        const assets = [];
+
+        const process = (selector, attr, folder) => {
+          renderedDoc.querySelectorAll(selector).forEach((el, i) => {
+            const src = el.getAttribute(attr);
+            if (src && !src.startsWith('data:') && !src.startsWith('#')) {
+              try {
+                const absUrl = new URL(src, targetUrl).href;
+                const fileName = `file-${i}.${folder}`;
+                assets.push({ url: absUrl, path: `${folder}/${fileName}` });
+                el.setAttribute(attr, `./${folder}/${fileName}`);
+              } catch (e) {}
+            }
+          });
         };
 
-        let currentZipBlob = null;
-        let currentCode = '';
-        let currentCodeName = 'index.html';
+        process('link[rel="stylesheet"]', 'href', 'css');
+        process('script[src]', 'src', 'js');
+        process('img', 'src', 'img');
 
-        function showResultOptions(zipBlob, code, codeName = 'index.html') {
-            currentZipBlob = zipBlob || null;
-            currentCode = code || '';
-            currentCodeName = codeName || 'index.html';
-            document.getElementById('resultBox').classList.remove('hidden');
+        zip.file("index.html", renderedDoc.documentElement.outerHTML);
+
+        log(`Downloading assets (${assets.length}) ...`, '#5f8edb');
+        for (const asset of assets) {
+          try {
+            const res = await fetch(`/api/proxy?url=${encodeURIComponent(asset.url)}`);
+            if (res.ok) {
+              const blob = await res.blob();
+              zip.file(asset.path, blob);
+            }
+          } catch (e) {}
         }
 
-        function downloadBlob(blob, filename) {
-            if (!blob) return;
-            const objectUrl = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = objectUrl;
-            link.download = filename;
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-            setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
-        }
+        log('Packing ZIP archive ...', '#8bb8ff');
+        const content = await zip.generateAsync({ type: "blob" });
+        const zipName = new URL(targetUrl).hostname.replace(/\./g, '_') + '_advanced.zip';
 
-        document.getElementById('downloadZipBtn').addEventListener('click', () => {
-            downloadBlob(currentZipBlob, currentZipBlob?.name || 'website.zip');
-        });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(content);
+        link.download = zipName;
+        link.click();
 
-        document.getElementById('downloadCodeBtn').addEventListener('click', () => {
-            if (!currentCode) return;
-            downloadBlob(new Blob([currentCode], { type: 'text/html;charset=utf-8' }), currentCodeName);
-        });
-
-        function setCopyStatus(message, ok = true) {
-            const status = document.getElementById('copyStatus');
-            status.textContent = message;
-            status.classList.remove('hidden');
-            status.style.color = ok ? '#00ff88' : '#ff6b6b';
-        }
-
-        async function copyTextToClipboard(text) {
-            if (!text) throw new Error('No code available to copy.');
-
-            // Modern Clipboard API works on HTTPS and localhost.
-            if (navigator.clipboard && window.isSecureContext) {
-                await navigator.clipboard.writeText(text);
-                return;
-            }
-
-            // Reliable fallback for older browsers / WebViews / HTTP contexts.
-            const area = document.createElement('textarea');
-            area.value = text;
-            area.setAttribute('readonly', '');
-            area.style.position = 'fixed';
-            area.style.left = '-9999px';
-            area.style.top = '0';
-            area.style.opacity = '0';
-            document.body.appendChild(area);
-            area.focus();
-            area.select();
-            area.setSelectionRange(0, area.value.length);
-
-            let copied = false;
-            try {
-                copied = document.execCommand('copy');
-            } finally {
-                area.remove();
-            }
-            if (!copied) throw new Error('Clipboard permission was denied.');
-        }
-
-        document.getElementById('copyCodeBtn').addEventListener('click', async () => {
-            const button = document.getElementById('copyCodeBtn');
-            if (!currentCode) {
-                setCopyStatus('NO CODE AVAILABLE — RUN EXTRACTION FIRST.', false);
-                return;
-            }
-
-            const originalText = button.textContent;
-            button.disabled = true;
-            button.textContent = 'COPYING...';
-            try {
-                await copyTextToClipboard(currentCode);
-                setCopyStatus('✓ CODE COPIED TO CLIPBOARD');
-                button.textContent = 'COPIED ✓';
-                setTimeout(() => { button.textContent = originalText; }, 1800);
-            } catch (error) {
-                setCopyStatus('COPY FAILED — ALLOW CLIPBOARD PERMISSION AND TRY AGAIN.', false);
-                button.textContent = 'TRY AGAIN';
-            } finally {
-                button.disabled = false;
-            }
-        });
-
-        // Lightweight animated hexagon field for the cyber background.
-        (() => {
-            const field = document.getElementById('hexagonField');
-            const count = 24;
-            for (let i = 0; i < count; i++) {
-                const hex = document.createElement('span');
-                hex.className = 'hexagon';
-                hex.style.left = `${Math.random() * 100}%`;
-                hex.style.animationDelay = `${-Math.random() * 24}s`;
-                hex.style.animationDuration = `${15 + Math.random() * 14}s`;
-                hex.style.opacity = `${0.18 + Math.random() * 0.45}`;
-                field.appendChild(hex);
-            }
-        })();
-
-        async function runScraper() {
-            const url = document.getElementById('urlInput').value.trim();
-            const isAdvanced = document.getElementById('advancedMode').checked;
-            if (!url || url === 'https://') return alert('ERROR: URL_REQUIRED');
-
-            document.getElementById('sysLog').classList.remove('hidden');
-            document.getElementById('resultBox').classList.add('hidden');
-            document.getElementById('logContent').innerHTML = '';
-            currentZipBlob = null;
-            currentCode = '';
-            log('Initializing Protocol...');
-
-            const btn = document.getElementById('runBtn');
-            btn.innerText = 'RUNNING...';
-            btn.disabled = true;
-
-            try {
-                if (isAdvanced) {
-                    await executeUserSideExtraction(url);
-                } else {
-                    log('Executing Server-Side Scrape...');
-                    const response = await fetch(`/api/convert?url=${encodeURIComponent(url)}`);
-                    if (!response.ok) {
-                        const message = await response.text();
-                        throw new Error(message || `Server returned ${response.status}`);
-                    }
-                    const zipBlob = await response.blob();
-                    const codeResponse = await fetch(`/api/code?url=${encodeURIComponent(url)}`);
-                    const code = codeResponse.ok ? await codeResponse.text() : '';
-                    const hostname = new URL(url.startsWith('http') ? url : `https://${url}`).hostname.replace(/^www\./, '').replace(/\./g, '_');
-                    zipBlob.name = `${hostname}.zip`;
-                    showResultOptions(zipBlob, code, `${hostname}.html`);
-                    log('COMPLETE! Download or copy the extracted code below.', '#00ff88');
-                }
-            } catch (err) {
-                log(`FAILED: ${err.message}`, 'red');
-            } finally {
-                btn.innerText = 'Execute Extraction';
-                btn.disabled = false;
-            }
-        }
-
-        async function executeUserSideExtraction(targetUrl) {
-            try {
-                log("Engaging User-Side Rendering Engine...", "#7000ff");
-                const zip = new JSZip();
-                
-                log("Fetching Raw Code via Stealth Proxy...");
-                const proxyUrl = `/api/proxy?url=${encodeURIComponent(targetUrl)}`;
-                const response = await fetch(proxyUrl);
-                if (!response.ok) throw new Error("Server Blocked (403)");
-                const html = await response.text();
-
-                log("Injecting Render Chamber...");
-                const frame = document.getElementById('renderFrame');
-                const frameDoc = frame.contentDocument || frame.contentWindow.document;
-                frameDoc.open();
-                frameDoc.write(html);
-                frameDoc.close();
-
-                log("Waiting for React Hydration (8s)...");
-                await new Promise(r => setTimeout(r, 8000));
-
-                log("Capturing Hydrated DOM...");
-                const renderedDoc = frameDoc.cloneNode(true);
-                const assets = [];
-                
-                const process = (selector, attr, folder) => {
-                    renderedDoc.querySelectorAll(selector).forEach((el, i) => {
-                        const src = el.getAttribute(attr);
-                        if (src && !src.startsWith('data:') && !src.startsWith('#')) {
-                            try {
-                                const absUrl = new URL(src, targetUrl).href;
-                                const fileName = `file-${i}.${folder}`;
-                                assets.push({ url: absUrl, path: `${folder}/${fileName}` });
-                                el.setAttribute(attr, `./${folder}/${fileName}`);
-                            } catch (e) {}
-                        }
-                    });
-                };
-
-                process('link[rel="stylesheet"]', 'href', 'css');
-                process('script[src]', 'src', 'js');
-                process('img', 'src', 'img');
-
-                zip.file("index.html", renderedDoc.documentElement.outerHTML);
-
-                log(`Downloading Assets (${assets.length})...`);
-                for (const asset of assets) {
-                    try {
-                        const res = await fetch(`/api/proxy?url=${encodeURIComponent(asset.url)}`);
-                        if (res.ok) {
-                            const blob = await res.blob();
-                            zip.file(asset.path, blob);
-                        }
-                    } catch (e) {}
-                }
-
-                log("Packaging Final ZIP...", "#00ff88");
-                const content = await zip.generateAsync({ type: "blob" });
-                const zipName = new URL(targetUrl).hostname.replace(/\./g, '_') + "_advanced.zip";
-                content.name = zipName;
-                const code = renderedDoc.documentElement.outerHTML;
-                showResultOptions(content, code, 'index.html');
-
-                log("COMPLETE! Download or copy the rendered code below.", "#00ff88");
-            } catch (err) {
-                log(`FAILED: ${err.message}`, "red");
-            }
-        }
-    </script>
+        log('✅ Extraction complete!', '#7aa7ff');
+      } catch (err) {
+        log(`❌ FAILED: ${err.message}`, '#e07070');
+      }
+    }
+  </script>
 </body>
 </html>
