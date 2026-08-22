@@ -4,268 +4,93 @@ const cheerio = require('cheerio');
 const JSZip = require('jszip');
 const path = require('path');
 const crypto = require('crypto');
-const { Pool } = require('pg');
 
 const app = express();
-const PORT = Number(process.env.PORT) || 10000;
-const COOKIE_NAME = 'web2zip_session';
-const SESSION_SECRET = process.env.SESSION_SECRET || 'change-this-secret-in-production';
-const LOGIN_EMAIL = process.env.DEMO_EMAIL || 'admin@example.com';
-const LOGIN_PASSWORD = process.env.DEMO_PASSWORD || 'ChangeMe123!';
+const PORT = process.env.PORT || 3000;
+const SESSION_SECRET = process.env.SESSION_SECRET || 'change-this-in-render';
+const sessions = new Map();
 
-const pool = process.env.DATABASE_URL ? new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: process.env.DATABASE_SSL === 'false' ? false : { rejectUnauthorized: false }
-}) : null;
-
-const users = new Map();
-
-function hashPassword(password, salt = crypto.randomBytes(16).toString('hex')) {
-    const hash = crypto.scryptSync(password, salt, 64).toString('hex');
-    return { salt, hash };
-}
-
-function verifyPassword(password, salt, storedHash) {
-    const hash = crypto.scryptSync(password, salt, 64).toString('hex');
-    return crypto.timingSafeEqual(Buffer.from(hash, 'hex'), Buffer.from(storedHash, 'hex'));
-}
-
-let databaseReady = Promise.resolve();
-
-async function ensureDatabase() {
-    if (!pool) return;
-    await pool.query(`CREATE TABLE IF NOT EXISTS users (
-        id SERIAL PRIMARY KEY,
-        name TEXT NOT NULL,
-        email TEXT UNIQUE NOT NULL,
-        password_hash TEXT NOT NULL,
-        password_salt TEXT NOT NULL,
-        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    )`);
-}
-
-async function findUser(email) {
-    const normalized = email.toLowerCase();
-    if (pool) {
-        const result = await pool.query('SELECT * FROM users WHERE email = $1 LIMIT 1', [normalized]);
-        return result.rows[0] || null;
-    }
-    return users.get(normalized) || null;
-}
-
-async function createUser(name, email, password) {
-    const normalized = email.toLowerCase();
-    const { salt, hash } = hashPassword(password);
-    if (pool) {
-        const result = await pool.query(
-            'INSERT INTO users (name, email, password_hash, password_salt) VALUES ($1, $2, $3, $4) RETURNING id, name, email',
-            [name, normalized, hash, salt]
-        );
-        return result.rows[0];
-    }
-    const user = { id: crypto.randomUUID(), name, email: normalized, password_hash: hash, password_salt: salt };
-    users.set(normalized, user);
-    return user;
-}
-
-app.set('trust proxy', 1);
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-function b64url(value) {
-    return Buffer.from(value).toString('base64url');
-}
+app.use(express.json({ limit: '1mb' }));
+app.use(express.static(path.join(__dirname, 'public')));
 
 function sign(value) {
-    return crypto.createHmac('sha256', SESSION_SECRET).update(value).digest('base64url');
+    return crypto.createHmac('sha256', SESSION_SECRET).update(value).digest('hex');
 }
-
-function createSession(payload) {
-    const body = b64url(JSON.stringify({ ...payload, exp: Date.now() + 24 * 60 * 60 * 1000 }));
-    return `${body}.${sign(body)}`;
+function makeToken(user) {
+    const payload = Buffer.from(JSON.stringify({ user, exp: Date.now() + 24 * 60 * 60 * 1000 })).toString('base64url');
+    return `${payload}.${sign(payload)}`;
 }
-
-function readSession(req) {
-    const header = req.headers.cookie || '';
-    const match = header.split(';').map(v => v.trim()).find(v => v.startsWith(`${COOKIE_NAME}=`));
-    if (!match) return null;
-    const token = decodeURIComponent(match.slice(COOKIE_NAME.length + 1));
-    const [body, signature] = token.split('.');
-    if (!body || !signature || !crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(sign(body)))) return null;
+function readToken(token) {
     try {
-        const data = JSON.parse(Buffer.from(body, 'base64url').toString('utf8'));
-        return data.exp > Date.now() ? data : null;
-    } catch (_) {
-        return null;
-    }
+        const [payload, signature] = token.split('.');
+        if (!payload || !signature || !crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(sign(payload)))) return null;
+        const data = JSON.parse(Buffer.from(payload, 'base64url').toString());
+        if (data.exp < Date.now()) return null;
+        return data;
+    } catch (_) { return null; }
+}
+function auth(req, res, next) {
+    const header = req.headers.authorization || '';
+    const token = header.startsWith('Bearer ') ? header.slice(7) : '';
+    const session = readToken(token);
+    if (!session) return res.status(401).json({ error: 'LOGIN_REQUIRED' });
+    req.user = session.user;
+    next();
 }
 
-function setSession(res, payload) {
-    res.setHeader('Set-Cookie', `${COOKIE_NAME}=${encodeURIComponent(createSession(payload))}; Path=/; Max-Age=86400; HttpOnly; SameSite=Lax${process.env.NODE_ENV === 'production' ? '; Secure' : ''}`);
-}
+// Demo email authentication. For production, replace with a real database/provider.
+const DEMO_USERS = new Map([
+    [process.env.DEMO_EMAIL || 'admin@example.com', process.env.DEMO_PASSWORD || 'ChangeMe123!']
+]);
 
-function clearSession(res) {
-    res.setHeader('Set-Cookie', `${COOKIE_NAME}=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax${process.env.NODE_ENV === 'production' ? '; Secure' : ''}`);
-}
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 
-function requireAuth(req, res, next) {
-    if (readSession(req)) return next();
-    if (req.path.startsWith('/api/')) return res.status(401).json({ error: 'Authentication required.' });
-    return res.redirect('/login');
-}
-
-function safeRedirect(value) {
-    return typeof value === 'string' && value.startsWith('/') && !value.startsWith('//') ? value : '/';
-}
-
-app.get('/login', (req, res) => {
-    if (readSession(req)) return res.redirect('/');
-    res.sendFile(path.join(__dirname, 'public', 'login.html'));
-});
-
-app.get('/register', (req, res) => {
-    if (readSession(req)) return res.redirect('/');
-    res.sendFile(path.join(__dirname, 'public', 'register.html'));
-});
-
-app.post('/api/register', async (req, res) => {
-    await databaseReady;
-    const name = String(req.body.name || '').trim();
+app.post('/api/login', (req, res) => {
     const email = String(req.body.email || '').trim().toLowerCase();
     const password = String(req.body.password || '');
-    if (name.length < 2) return res.status(400).json({ error: 'Please enter your name.' });
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ error: 'Enter a valid email address.' });
-    if (password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters.' });
-    try {
-        if (await findUser(email)) return res.status(409).json({ error: 'An account with that email already exists. Please log in.' });
-        const user = await createUser(name, email, password);
-        setSession(res, { email: user.email, name: user.name, provider: 'password' });
-        res.json({ ok: true, redirect: '/' });
-    } catch (error) {
-        console.error('Registration error:', error);
-        res.status(500).json({ error: 'Could not create your account. Please try again.' });
-    }
+    if (!email || !password) return res.status(400).json({ error: 'EMAIL_AND_PASSWORD_REQUIRED' });
+    const expected = DEMO_USERS.get(email);
+    if (!expected || password !== expected) return res.status(401).json({ error: 'INVALID_LOGIN' });
+    res.json({ token: makeToken(email), email });
 });
 
-app.post('/api/login', async (req, res) => {
-    await databaseReady;
-    const email = String(req.body.email || '').trim().toLowerCase();
-    const password = String(req.body.password || '');
-    try {
-        const user = await findUser(email);
-        const validDemo = email === LOGIN_EMAIL.toLowerCase() && password === LOGIN_PASSWORD && !user;
-        const validUser = user && verifyPassword(password, user.password_salt, user.password_hash);
-        if (!validUser && !validDemo) return res.status(401).json({ error: 'Invalid email or password.' });
-        setSession(res, { email, name: user?.name || 'Admin', provider: 'password' });
-        res.json({ ok: true, redirect: safeRedirect(req.body.redirect || '/') });
-    } catch (error) {
-        console.error('Login error:', error);
-        res.status(500).json({ error: 'Login is temporarily unavailable.' });
-    }
+app.get('/api/oauth/:provider', (req, res) => {
+    // OAuth requires your own Google/GitHub OAuth credentials and callback URLs.
+    const provider = String(req.params.provider).toLowerCase();
+    if (!['google', 'github'].includes(provider)) return res.status(400).json({ error: 'UNSUPPORTED_PROVIDER' });
+    res.status(501).json({ error: 'OAUTH_NOT_CONFIGURED', message: `Configure ${provider} OAuth credentials before enabling this button.` });
 });
 
-app.post('/api/logout', (req, res) => {
-    clearSession(res);
-    res.json({ ok: true });
-});
+app.get('/api/me', auth, (req, res) => res.json({ authenticated: true, email: req.user }));
 
-app.get('/api/me', (req, res) => {
-    const session = readSession(req);
-    res.json(session ? { authenticated: true, email: session.email, provider: session.provider } : { authenticated: false });
-});
-
-// Optional OAuth endpoints. Configure the matching environment variables to enable them.
-function oauthConfig(provider) {
-    if (provider === 'google') return {
-        clientId: process.env.GOOGLE_CLIENT_ID,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        authorize: 'https://accounts.google.com/o/oauth2/v2/auth',
-        token: 'https://oauth2.googleapis.com/token',
-        user: 'https://openidconnect.googleapis.com/v1/userinfo',
-        scope: 'openid email profile'
-    };
-    if (provider === 'github') return {
-        clientId: process.env.GITHUB_CLIENT_ID,
-        clientSecret: process.env.GITHUB_CLIENT_SECRET,
-        authorize: 'https://github.com/login/oauth/authorize',
-        token: 'https://github.com/login/oauth/access_token',
-        user: 'https://api.github.com/user',
-        scope: 'read:user user:email'
-    };
-}
-
-function baseUrl(req) {
-    if (process.env.APP_URL) return process.env.APP_URL.replace(/\/$/, '');
-    const proto = req.headers['x-forwarded-proto'] || req.protocol;
-    return `${proto}://${req.get('host')}`;
-}
-
-app.get('/auth/:provider', (req, res) => {
-    const provider = req.params.provider;
-    const cfg = oauthConfig(provider);
-    if (!cfg || !cfg.clientId || !cfg.clientSecret) {
-        return res.status(503).send(`${provider} login is not configured. Add the required environment variables.`);
-    }
-    const state = crypto.randomBytes(24).toString('hex');
-    const redirectUri = `${baseUrl(req)}/auth/${provider}/callback`;
-    const params = new URLSearchParams({ client_id: cfg.clientId, redirect_uri: redirectUri, response_type: 'code', scope: cfg.scope, state });
-    res.setHeader('Set-Cookie', `oauth_state=${state}; Path=/; Max-Age=600; HttpOnly; SameSite=Lax${process.env.NODE_ENV === 'production' ? '; Secure' : ''}`);
-    res.redirect(`${cfg.authorize}?${params.toString()}`);
-});
-
-app.get('/auth/:provider/callback', async (req, res) => {
-    const provider = req.params.provider;
-    const cfg = oauthConfig(provider);
-    const cookies = Object.fromEntries((req.headers.cookie || '').split(';').filter(Boolean).map(v => v.trim().split('=')));
-    if (!cfg || !cfg.clientId || !cfg.clientSecret || !req.query.code || cookies.oauth_state !== req.query.state) return res.status(400).send('OAuth authentication failed.');
-    try {
-        const redirectUri = `${baseUrl(req)}/auth/${provider}/callback`;
-        const tokenResponse = await axios.post(cfg.token, new URLSearchParams({ client_id: cfg.clientId, client_secret: cfg.clientSecret, code: req.query.code, redirect_uri: redirectUri }), { headers: { Accept: 'application/json' } });
-        const accessToken = tokenResponse.data.access_token;
-        if (!accessToken) throw new Error('No access token returned.');
-        const userResponse = await axios.get(cfg.user, { headers: { Authorization: `Bearer ${accessToken}`, Accept: 'application/json', 'User-Agent': 'Web2Zip' } });
-        const email = userResponse.data.email || `${userResponse.data.login || userResponse.data.name || provider}@oauth.local`;
-        setSession(res, { email, provider });
-        res.setHeader('Set-Cookie', `oauth_state=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax${process.env.NODE_ENV === 'production' ? '; Secure' : ''}`);
-        res.redirect('/');
-    } catch (error) {
-        console.error('OAuth error:', error.response?.data || error.message);
-        res.status(500).send('OAuth login failed. Check your provider credentials and callback URL.');
-    }
-});
-
-app.get('/', requireAuth, (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-app.get('/api/proxy', requireAuth, async (req, res) => {
+app.get('/api/proxy', auth, async (req, res) => {
     const targetUrl = req.query.url;
     if (!targetUrl) return res.status(400).send('URL missing');
     try {
         const response = await axios.get(targetUrl, {
             responseType: 'arraybuffer',
-            headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36', Accept: '*/*' },
+            headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124.0.0.0 Safari/537.36', Accept: '*/*' },
             timeout: 15000,
             validateStatus: () => true
         });
         res.setHeader('Content-Type', response.headers['content-type'] || 'application/octet-stream');
+        res.setHeader('Access-Control-Allow-Origin', '*');
         res.status(response.status).send(response.data);
-    } catch (error) {
-        res.status(500).send(`Proxy Error: ${error.message}`);
-    }
+    } catch (error) { res.status(500).send(`Proxy Error: ${error.message}`); }
 });
 
-app.get('/api/convert', requireAuth, async (req, res) => {
+app.get('/api/convert', auth, async (req, res) => {
     let targetUrl = req.query.url;
     if (!targetUrl) return res.status(400).json({ error: 'URL MISSED!' });
-    if (!/^https?:\/\//i.test(targetUrl)) targetUrl = 'https://' + targetUrl;
-    let urlObj;
-    try { urlObj = new URL(targetUrl); } catch (_) { return res.status(400).json({ error: 'Invalid URL.' }); }
+    if (!targetUrl.startsWith('http')) targetUrl = 'https://' + targetUrl;
 
     const zip = new JSZip();
-    const zipName = urlObj.hostname.replace(/^www\./, '').replace(/\./g, '_') + '.zip';
+    let urlObj;
+    try { urlObj = new URL(targetUrl); } catch (_) { return res.status(400).json({ error: 'INVALID_URL' }); }
+    const zipName = urlObj.hostname.replace('www.', '').replace(/\./g, '_') + '.zip';
     const assets = [];
-    const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
+    const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124.0.0.0 Safari/537.36';
+
     try {
         const response = await axios.get(targetUrl, { headers: { 'User-Agent': userAgent }, timeout: 15000 });
         const $ = cheerio.load(response.data);
@@ -289,34 +114,15 @@ app.get('/api/convert', requireAuth, async (req, res) => {
         zip.file('index.html', $.html());
         for (const asset of assets) {
             try {
-                const assetResponse = await axios.get(asset.url, { responseType: 'arraybuffer', timeout: 5000, headers: { 'User-Agent': userAgent } });
-                zip.file(asset.path, assetResponse.data);
+                const r = await axios.get(asset.url, { responseType: 'arraybuffer', timeout: 5000, headers: { 'User-Agent': userAgent } });
+                zip.file(asset.path, r.data);
             } catch (_) {}
         }
         const content = await zip.generateAsync({ type: 'nodebuffer' });
         res.setHeader('Content-Type', 'application/zip');
         res.setHeader('Content-Disposition', `attachment; filename="${zipName}"`);
         res.send(content);
-    } catch (error) {
-        res.status(500).json({ error: 'Server extraction failed.', details: error.message });
-    }
+    } catch (error) { res.status(500).json({ error: 'Server extraction failed.', details: error.message }); }
 });
 
-// Health check for Render/Vercel monitoring.
-app.get('/health', (req, res) => res.status(200).json({ status: 'ok' }));
-
-// Render needs the process to listen on 0.0.0.0:$PORT. Vercel imports the app as a serverless function.
-databaseReady = ensureDatabase().catch(error => {
-    console.error('Database initialization failed:', error.message);
-});
-
-if (!process.env.VERCEL) {
-    databaseReady.then(() => {
-        app.listen(PORT, '0.0.0.0', () => console.log(`Web2Zip running on 0.0.0.0:${PORT}`));
-    }).catch(error => {
-        console.error('Database initialization failed:', error.message);
-        app.listen(PORT, '0.0.0.0', () => console.log(`Web2Zip running on 0.0.0.0:${PORT} (database unavailable)`));
-    });
-}
-
-module.exports = app;
+app.listen(PORT, '0.0.0.0', () => console.log(`Web2Zip online on port ${PORT}`));
