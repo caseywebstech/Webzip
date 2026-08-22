@@ -4,6 +4,7 @@ const cheerio = require('cheerio');
 const JSZip = require('jszip');
 const path = require('path');
 const crypto = require('crypto');
+const { Pool } = require('pg');
 
 const app = express();
 const PORT = Number(process.env.PORT) || 10000;
@@ -11,6 +12,61 @@ const COOKIE_NAME = 'web2zip_session';
 const SESSION_SECRET = process.env.SESSION_SECRET || 'change-this-secret-in-production';
 const LOGIN_EMAIL = process.env.DEMO_EMAIL || 'admin@example.com';
 const LOGIN_PASSWORD = process.env.DEMO_PASSWORD || 'ChangeMe123!';
+
+const pool = process.env.DATABASE_URL ? new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: process.env.DATABASE_SSL === 'false' ? false : { rejectUnauthorized: false }
+}) : null;
+
+const users = new Map();
+
+function hashPassword(password, salt = crypto.randomBytes(16).toString('hex')) {
+    const hash = crypto.scryptSync(password, salt, 64).toString('hex');
+    return { salt, hash };
+}
+
+function verifyPassword(password, salt, storedHash) {
+    const hash = crypto.scryptSync(password, salt, 64).toString('hex');
+    return crypto.timingSafeEqual(Buffer.from(hash, 'hex'), Buffer.from(storedHash, 'hex'));
+}
+
+let databaseReady = Promise.resolve();
+
+async function ensureDatabase() {
+    if (!pool) return;
+    await pool.query(`CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        name TEXT NOT NULL,
+        email TEXT UNIQUE NOT NULL,
+        password_hash TEXT NOT NULL,
+        password_salt TEXT NOT NULL,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )`);
+}
+
+async function findUser(email) {
+    const normalized = email.toLowerCase();
+    if (pool) {
+        const result = await pool.query('SELECT * FROM users WHERE email = $1 LIMIT 1', [normalized]);
+        return result.rows[0] || null;
+    }
+    return users.get(normalized) || null;
+}
+
+async function createUser(name, email, password) {
+    const normalized = email.toLowerCase();
+    const { salt, hash } = hashPassword(password);
+    if (pool) {
+        const result = await pool.query(
+            'INSERT INTO users (name, email, password_hash, password_salt) VALUES ($1, $2, $3, $4) RETURNING id, name, email',
+            [name, normalized, hash, salt]
+        );
+        return result.rows[0];
+    }
+    const user = { id: crypto.randomUUID(), name, email: normalized, password_hash: hash, password_salt: salt };
+    users.set(normalized, user);
+    return user;
+}
 
 app.set('trust proxy', 1);
 app.use(express.json());
@@ -67,14 +123,45 @@ app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
-app.post('/api/login', (req, res) => {
+app.get('/register', (req, res) => {
+    if (readSession(req)) return res.redirect('/');
+    res.sendFile(path.join(__dirname, 'public', 'register.html'));
+});
+
+app.post('/api/register', async (req, res) => {
+    await databaseReady;
+    const name = String(req.body.name || '').trim();
     const email = String(req.body.email || '').trim().toLowerCase();
     const password = String(req.body.password || '');
-    if (email !== LOGIN_EMAIL.toLowerCase() || password !== LOGIN_PASSWORD) {
-        return res.status(401).json({ error: 'Invalid email or password.' });
+    if (name.length < 2) return res.status(400).json({ error: 'Please enter your name.' });
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ error: 'Enter a valid email address.' });
+    if (password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters.' });
+    try {
+        if (await findUser(email)) return res.status(409).json({ error: 'An account with that email already exists. Please log in.' });
+        const user = await createUser(name, email, password);
+        setSession(res, { email: user.email, name: user.name, provider: 'password' });
+        res.json({ ok: true, redirect: '/' });
+    } catch (error) {
+        console.error('Registration error:', error);
+        res.status(500).json({ error: 'Could not create your account. Please try again.' });
     }
-    setSession(res, { email, provider: 'password' });
-    res.json({ ok: true, redirect: safeRedirect(req.body.redirect || '/') });
+});
+
+app.post('/api/login', async (req, res) => {
+    await databaseReady;
+    const email = String(req.body.email || '').trim().toLowerCase();
+    const password = String(req.body.password || '');
+    try {
+        const user = await findUser(email);
+        const validDemo = email === LOGIN_EMAIL.toLowerCase() && password === LOGIN_PASSWORD && !user;
+        const validUser = user && verifyPassword(password, user.password_salt, user.password_hash);
+        if (!validUser && !validDemo) return res.status(401).json({ error: 'Invalid email or password.' });
+        setSession(res, { email, name: user?.name || 'Admin', provider: 'password' });
+        res.json({ ok: true, redirect: safeRedirect(req.body.redirect || '/') });
+    } catch (error) {
+        console.error('Login error:', error);
+        res.status(500).json({ error: 'Login is temporarily unavailable.' });
+    }
 });
 
 app.post('/api/logout', (req, res) => {
@@ -219,9 +306,17 @@ app.get('/api/convert', requireAuth, async (req, res) => {
 app.get('/health', (req, res) => res.status(200).json({ status: 'ok' }));
 
 // Render needs the process to listen on 0.0.0.0:$PORT. Vercel imports the app as a serverless function.
+databaseReady = ensureDatabase().catch(error => {
+    console.error('Database initialization failed:', error.message);
+});
+
 if (!process.env.VERCEL) {
-    app.listen(PORT, '0.0.0.0', () => console.log(`Web2Zip running on 0.0.0.0:${PORT}`));
+    databaseReady.then(() => {
+        app.listen(PORT, '0.0.0.0', () => console.log(`Web2Zip running on 0.0.0.0:${PORT}`));
+    }).catch(error => {
+        console.error('Database initialization failed:', error.message);
+        app.listen(PORT, '0.0.0.0', () => console.log(`Web2Zip running on 0.0.0.0:${PORT} (database unavailable)`));
+    });
 }
 
 module.exports = app;
-
