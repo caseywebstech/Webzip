@@ -12,7 +12,7 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      background: #0b0d17;
+      background: #05080f;
       font-family: 'JetBrains Mono', monospace;
       min-height: 100vh;
       display: flex;
@@ -24,8 +24,8 @@
       overflow-x: hidden;
     }
 
-    /* ——— black‑blue particle canvas ——— */
-    #particle-canvas {
+    /* ——— dark animated lines (background) ——— */
+    #lines-canvas {
       position: fixed;
       top: 0;
       left: 0;
@@ -34,24 +34,25 @@
       z-index: 0;
       pointer-events: none;
       background: transparent;
+      opacity: 0.5;
     }
 
-    /* ——— main card ——— */
+    /* ——— main card (darker) ——— */
     .cyber-card {
       position: relative;
       z-index: 10;
-      background: #11141f;
+      background: #0a0e17;
       backdrop-filter: blur(2px);
       width: 100%;
       max-width: 540px;
       padding: 2rem 2rem 1.8rem;
       border-radius: 2.5rem 1rem 2.5rem 1rem;
-      box-shadow: 0 20px 40px -12px rgba(0, 10, 30, 0.8);
-      border: 1px solid rgba(40, 80, 180, 0.25);
+      box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(60, 130, 255, 0.08);
+      border: 1px solid rgba(30, 60, 120, 0.3);
       transition: all 0.2s;
     }
 
-    /* profile picture – centre top */
+    /* profile picture – centre top (using the URL) */
     .profile-wrapper {
       display: flex;
       justify-content: center;
@@ -59,27 +60,29 @@
       margin-bottom: 1.2rem;
     }
     .profile-pic {
-      width: 88px;
-      height: 88px;
+      width: 92px;
+      height: 92px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #0b1a30, #1b2f4a);
-      border: 3px solid #3b6fbb;
-      box-shadow: 0 0 0 4px rgba(20, 60, 140, 0.3), 0 0 30px rgba(30, 90, 200, 0.2);
+      background: #0b1424;
+      border: 3px solid #2a5599;
+      box-shadow: 0 0 0 4px rgba(20, 50, 120, 0.3), 0 0 30px rgba(30, 80, 200, 0.15);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 2.8rem;
-      font-weight: 800;
-      color: #b0d0ff;
-      letter-spacing: 2px;
-      background-image: radial-gradient(circle at 30% 30%, #2b5a9a, #0c1e3a);
-      user-select: none;
+      overflow: hidden;
       transition: 0.25s;
+      background-image: radial-gradient(circle at 30% 30%, #1a3a6e, #0a1428);
+    }
+    .profile-pic img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
     }
     .profile-pic:hover {
       transform: scale(1.02);
-      border-color: #6b9cff;
-      box-shadow: 0 0 0 6px rgba(50, 120, 255, 0.2);
+      border-color: #4f87e6;
+      box-shadow: 0 0 0 6px rgba(40, 100, 220, 0.2);
     }
 
     /* ——— title ——— */
@@ -87,27 +90,27 @@
       font-size: 1.9rem;
       font-weight: 800;
       letter-spacing: -0.02em;
-      background: linear-gradient(to right, #c8e0ff, #7aa7ff);
+      background: linear-gradient(to right, #b0ccff, #6a9aff);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      text-shadow: 0 0 20px rgba(60, 130, 255, 0.15);
+      text-shadow: 0 0 20px rgba(40, 100, 220, 0.2);
       line-height: 1.2;
     }
     .brand-sub {
       font-size: 0.7rem;
       letter-spacing: 3px;
-      color: #6889c0;
-      border-left: 3px solid #2f5f9e;
+      color: #4a6e9e;
+      border-left: 3px solid #2a4a7a;
       padding-left: 12px;
       margin-top: 4px;
     }
 
-    /* ——— inputs & elements ——— */
+    /* ——— inputs & elements (darker) ——— */
     .tech-input {
-      background: rgba(8, 16, 32, 0.8);
-      border: 1px solid #263b60;
-      color: #e4f0ff;
+      background: rgba(6, 12, 26, 0.9);
+      border: 1px solid #1a3050;
+      color: #d0e4ff;
       border-radius: 14px;
       padding: 0.9rem 1.2rem;
       width: 100%;
@@ -118,55 +121,55 @@
       backdrop-filter: blur(2px);
     }
     .tech-input:focus {
-      border-color: #4f87e6;
-      box-shadow: 0 0 0 3px rgba(60, 130, 255, 0.15);
-      background: rgba(12, 22, 44, 0.9);
+      border-color: #3a70c0;
+      box-shadow: 0 0 0 3px rgba(40, 100, 220, 0.15);
+      background: rgba(8, 16, 34, 0.95);
     }
     .tech-input::placeholder {
-      color: #4a6590;
+      color: #3a5a7a;
       font-weight: 300;
       letter-spacing: 0.5px;
     }
 
     .btn-execute {
-      background: #1a3a6e;
+      background: #142a4e;
       border: none;
       border-radius: 40px;
       padding: 1rem 1.5rem;
       font-weight: 700;
       letter-spacing: 1.5px;
-      color: #eaf3ff;
+      color: #dceaff;
       text-transform: uppercase;
       font-size: 0.9rem;
       transition: 0.25s;
       cursor: pointer;
-      box-shadow: 0 6px 0 #0b1a32, 0 8px 20px rgba(20, 60, 160, 0.2);
+      box-shadow: 0 6px 0 #071024, 0 8px 20px rgba(10, 30, 80, 0.4);
       width: 100%;
       backdrop-filter: blur(2px);
-      border: 1px solid #2f5590;
+      border: 1px solid #1f3d6e;
     }
     .btn-execute:hover {
-      background: #214a86;
+      background: #1a3a72;
       transform: translateY(-2px);
-      box-shadow: 0 8px 0 #0b1a32, 0 12px 30px rgba(30, 80, 200, 0.3);
+      box-shadow: 0 8px 0 #071024, 0 12px 30px rgba(20, 60, 160, 0.3);
     }
     .btn-execute:active {
       transform: translateY(4px);
-      box-shadow: 0 2px 0 #0b1a32;
+      box-shadow: 0 2px 0 #071024;
     }
 
     .status-box {
-      background: rgba(10, 22, 44, 0.6);
-      border-left: 4px solid #3d78d4;
+      background: rgba(6, 14, 30, 0.7);
+      border-left: 4px solid #2a5a9a;
       border-radius: 12px;
       padding: 0.8rem 1rem;
       backdrop-filter: blur(2px);
     }
 
     .badge-soft {
-      background: rgba(30, 80, 180, 0.15);
-      color: #89b0f0;
-      border: 1px solid #2a4a7a;
+      background: rgba(20, 60, 140, 0.2);
+      color: #6e94d0;
+      border: 1px solid #1a3a6a;
       border-radius: 40px;
       padding: 0.2rem 1rem;
       font-size: 0.65rem;
@@ -174,35 +177,36 @@
       font-weight: 700;
     }
 
-    /* toggle switch (black‑blue) */
+    /* toggle switch (dark blue) */
     .toggle-checkbox:checked + .toggle-slider {
-      background: #2355a8;
-      box-shadow: 0 0 15px #2355a8;
+      background: #1a4a88;
+      box-shadow: 0 0 15px #1a4a88;
     }
     .toggle-slider {
-      background: #1c2d4a;
+      background: #12223a;
       transition: 0.25s;
       border-radius: 999px;
       width: 44px;
       height: 24px;
       position: relative;
       cursor: pointer;
+      border: 1px solid #1a3a5a;
     }
     .toggle-slider::after {
       content: "";
       position: absolute;
-      top: 3px;
-      left: 3px;
+      top: 2px;
+      left: 2px;
       width: 18px;
       height: 18px;
-      background: #b8d4ff;
+      background: #8ab0f0;
       border-radius: 50%;
       transition: 0.25s;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.5);
     }
     .toggle-checkbox:checked + .toggle-slider::after {
       transform: translateX(20px);
-      background: #dbeafe;
+      background: #c0dcff;
     }
     .toggle-checkbox {
       display: none;
@@ -210,12 +214,12 @@
 
     /* ——— code block ——— */
     .code-block {
-      background: #0b1424;
-      border: 1px solid #223d66;
+      background: #070e1e;
+      border: 1px solid #1a325a;
       border-radius: 14px;
       padding: 0.6rem 0.9rem;
       font-size: 0.65rem;
-      color: #8bb0f0;
+      color: #7a9edc;
       word-break: break-all;
       font-family: 'JetBrains Mono', monospace;
     }
@@ -224,8 +228,8 @@
     .footer-brand {
       font-size: 0.75rem;
       letter-spacing: 0.5px;
-      color: #6e8fc0;
-      border-top: 1px solid #1f3450;
+      color: #4a6e96;
+      border-top: 1px solid #142842;
       padding-top: 1.2rem;
       margin-top: 0.6rem;
       display: flex;
@@ -233,7 +237,7 @@
       align-items: center;
     }
     .footer-brand strong {
-      color: #b6d2ff;
+      color: #aac4f5;
       font-weight: 700;
       background: linear-gradient(to right, #7aa7ff, #b6d2ff);
       -webkit-background-clip: text;
@@ -243,26 +247,25 @@
 
     /* ——— utilities ——— */
     .glow-text {
-      text-shadow: 0 0 12px rgba(60, 130, 255, 0.2);
+      text-shadow: 0 0 12px rgba(40, 100, 220, 0.2);
     }
     .bg-particles-overlay {
-      background: radial-gradient(circle at 20% 30%, #0f1f3a, #070b14 80%);
+      background: radial-gradient(circle at 20% 30%, #0a162a, #03060d 80%);
     }
-    /* remove any neon edge – no box-shadow with neon colors, no clip-path */
   </style>
 </head>
 <body>
 
-  <!-- particle canvas (black‑blue particles) -->
-  <canvas id="particle-canvas"></canvas>
+  <!-- animated lines background -->
+  <canvas id="lines-canvas"></canvas>
 
   <!-- main card -->
   <div class="cyber-card">
 
-    <!-- profile picture (center) -->
+    <!-- profile picture (centre) with the URL -->
     <div class="profile-wrapper">
-      <div class="profile-pic" aria-label="profile picture">
-        <span>CR</span>
+      <div class="profile-pic">
+        <img src="https://url.bmbxmd.workers.dev/QF65C.jpg" alt="profile" onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=\'font-size:2.8rem;color:#8ab0f0;\'>CR</span>'">
       </div>
     </div>
 
@@ -274,17 +277,17 @@
 
     <!-- url input -->
     <div class="mb-4">
-      <label class="text-[0.6rem] tracking-[0.2em] text-[#5980bd] font-bold uppercase block mb-1.5">Target URL</label>
+      <label class="text-[0.6rem] tracking-[0.2em] text-[#3d6a9a] font-bold uppercase block mb-1.5">Target URL</label>
       <input type="text" id="urlInput" 
              class="tech-input" 
              placeholder="https://example.com" value="https://">
     </div>
 
-    <!-- advanced toggle (black‑blue) -->
-    <div class="flex items-center justify-between bg-[#0c162b] p-3 rounded-2xl border border-[#1e3760] mb-4">
+    <!-- advanced toggle (dark) -->
+    <div class="flex items-center justify-between bg-[#080f1f] p-3 rounded-2xl border border-[#162a4a] mb-4">
       <div>
-        <p class="text-sm font-bold text-[#b8d0f5] tracking-wide">Advanced Mode</p>
-        <p class="text-[0.55rem] text-[#5a7fa8] italic">client‑side render · bypass 403</p>
+        <p class="text-sm font-bold text-[#aac0ea] tracking-wide">Advanced Mode</p>
+        <p class="text-[0.55rem] text-[#4a6e92] italic">client‑side render · bypass 403</p>
       </div>
       <label class="relative flex items-center">
         <input type="checkbox" id="advancedMode" class="toggle-checkbox">
@@ -293,13 +296,13 @@
     </div>
 
     <!-- API endpoint -->
-    <div class="bg-[#0a1428] p-3 rounded-2xl border border-[#1e3760] mb-5">
+    <div class="bg-[#070e1e] p-3 rounded-2xl border border-[#162a4a] mb-5">
       <div class="flex justify-between items-center mb-1.5">
-        <span class="text-[0.55rem] font-bold text-[#5980bd] tracking-widest">SYSTEM API</span>
-        <span class="text-[0.5rem] bg-[#1a3a6e] text-[#b8d4ff] px-2 py-0.5 rounded-full font-bold">GET</span>
+        <span class="text-[0.55rem] font-bold text-[#3d6a9a] tracking-widest">SYSTEM API</span>
+        <span class="text-[0.5rem] bg-[#122a4e] text-[#aac4f0] px-2 py-0.5 rounded-full font-bold">GET</span>
       </div>
       <div class="code-block select-all">
-        /api/convert?url=<span class="text-[#b8d4ff]">{TARGET_URL}</span>
+        /api/convert?url=<span class="text-[#aac4f0]">{TARGET_URL}</span>
       </div>
     </div>
 
@@ -311,14 +314,14 @@
     <!-- log -->
     <div id="sysLog" class="status-box mt-5 hidden">
       <div id="logContent" class="text-[0.7rem] space-y-1 max-h-36 overflow-y-auto">
-        <p class="text-[#92b7f0]">> Initializing scraper...</p>
+        <p class="text-[#7aa0e0]">> Initializing scraper...</p>
       </div>
     </div>
 
     <!-- footer: proudly made by Caseyrhodes Tech -->
     <div class="footer-brand">
       <span>✦ <strong>Proudly made by Caseyrhodes Tech</strong> ✦</span>
-      <span class="text-[0.5rem] bg-[#1c3050] px-3 py-1 rounded-full text-[#aac3f0] border border-[#2b4a7a]">READY</span>
+      <span class="text-[0.5rem] bg-[#0f1e38] px-3 py-1 rounded-full text-[#8ab0e8] border border-[#1a3a6a]">READY</span>
     </div>
   </div>
 
@@ -326,13 +329,13 @@
   <iframe id="renderFrame" style="display:none;"></iframe>
 
   <script>
-    // ——— black‑blue particle system ———
-    (function initParticles() {
-      const canvas = document.getElementById('particle-canvas');
+    // ——— animated lines (background) ———
+    (function initLines() {
+      const canvas = document.getElementById('lines-canvas');
       const ctx = canvas.getContext('2d');
       let w, h;
-      const particles = [];
-      const COUNT = 110;
+      const lines = [];
+      const LINE_COUNT = 18;
 
       function resize() {
         w = canvas.width = window.innerWidth;
@@ -341,71 +344,79 @@
       window.addEventListener('resize', resize);
       resize();
 
-      class Particle {
-        constructor() { this.reset(); }
+      class MovingLine {
+        constructor() {
+          this.reset();
+        }
         reset() {
-          this.x = Math.random() * w;
-          this.y = Math.random() * h;
-          this.size = Math.random() * 2.2 + 0.8;
-          this.speedX = (Math.random() - 0.5) * 0.25;
-          this.speedY = (Math.random() - 0.5) * 0.25;
-          this.opacity = Math.random() * 0.6 + 0.2;
-          this.color = `rgba(70, 140, 255, ${this.opacity})`;
+          this.x1 = Math.random() * w;
+          this.y1 = Math.random() * h;
+          this.x2 = Math.random() * w;
+          this.y2 = Math.random() * h;
+          this.speed = 0.15 + Math.random() * 0.25;
+          this.angle = Math.random() * Math.PI * 2;
+          this.length = 40 + Math.random() * 100;
+          this.opacity = 0.03 + Math.random() * 0.08;
+          this.color = `rgba(60, 140, 255, ${this.opacity})`;
+          // direction
+          this.dx = Math.cos(this.angle) * this.speed;
+          this.dy = Math.sin(this.angle) * this.speed;
         }
         update() {
-          this.x += this.speedX;
-          this.y += this.speedY;
-          if (this.x < 0 || this.x > w) this.speedX *= -1;
-          if (this.y < 0 || this.y > h) this.speedY *= -1;
+          this.x1 += this.dx;
+          this.y1 += this.dy;
+          this.x2 += this.dx;
+          this.y2 += this.dy;
+
+          // wrap around
+          if (this.x1 < -50) { this.x1 = w + 50; this.x2 = this.x1 + this.length * 0.6; }
+          if (this.x1 > w + 50) { this.x1 = -50; this.x2 = this.x1 - this.length * 0.6; }
+          if (this.y1 < -50) { this.y1 = h + 50; this.y2 = this.y1 + this.length * 0.4; }
+          if (this.y1 > h + 50) { this.y1 = -50; this.y2 = this.y1 - this.length * 0.4; }
+
+          // keep x2 relative
+          const dx = this.x2 - this.x1;
+          const dy = this.y2 - this.y1;
+          const dist = Math.hypot(dx, dy);
+          if (dist > 0) {
+            this.x2 = this.x1 + (dx / dist) * this.length;
+            this.y2 = this.y1 + (dy / dist) * this.length;
+          }
         }
         draw() {
           ctx.beginPath();
-          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-          ctx.fillStyle = this.color;
-          ctx.fill();
-          // subtle glow
-          if (this.size > 1.6) {
-            ctx.shadowColor = 'rgba(40, 100, 220, 0.2)';
-            ctx.shadowBlur = 12;
-            ctx.fill();
-            ctx.shadowBlur = 0;
-          }
+          ctx.moveTo(this.x1, this.y1);
+          ctx.lineTo(this.x2, this.y2);
+          ctx.strokeStyle = this.color;
+          ctx.lineWidth = 1.2;
+          ctx.stroke();
         }
       }
 
-      for (let i = 0; i < COUNT; i++) {
-        particles.push(new Particle());
+      for (let i = 0; i < LINE_COUNT; i++) {
+        lines.push(new MovingLine());
       }
 
-      function draw() {
+      function drawLines() {
         ctx.clearRect(0, 0, w, h);
-        for (let p of particles) {
-          p.update();
-          p.draw();
+        for (let line of lines) {
+          line.update();
+          line.draw();
         }
-        // extra small connection lines (very subtle)
-        ctx.strokeStyle = 'rgba(50, 120, 220, 0.06)';
-        ctx.lineWidth = 0.5;
-        for (let i = 0; i < particles.length; i++) {
-          for (let j = i + 1; j < particles.length; j++) {
-            const dx = particles[i].x - particles[j].x;
-            const dy = particles[i].y - particles[j].y;
-            const dist = Math.hypot(dx, dy);
-            if (dist < 100) {
-              ctx.beginPath();
-              ctx.moveTo(particles[i].x, particles[i].y);
-              ctx.lineTo(particles[j].x, particles[j].y);
-              ctx.stroke();
-            }
-          }
+        // extra subtle glow lines
+        ctx.shadowColor = 'rgba(30, 100, 220, 0.02)';
+        ctx.shadowBlur = 10;
+        for (let line of lines) {
+          line.draw();
         }
-        requestAnimationFrame(draw);
+        ctx.shadowBlur = 0;
+        requestAnimationFrame(drawLines);
       }
-      draw();
+      drawLines();
     })();
 
     // ——— scraper logic ———
-    const log = (msg, color = "#8bb8ff") => {
+    const log = (msg, color = "#7aa0e0") => {
       const container = document.getElementById('logContent');
       const p = document.createElement('p');
       p.style.color = color;
@@ -435,9 +446,8 @@
       if (isAdvanced) {
         await executeUserSideExtraction(url);
       } else {
-        log('Executing server‑side scrape ...', '#7aa7ff');
+        log('Executing server‑side scrape ...', '#5f8edb');
         window.location.href = `/api/convert?url=${encodeURIComponent(url)}`;
-        // fallback: re-enable after 5s
         setTimeout(() => {
           btn.innerText = originalText;
           btn.disabled = false;
