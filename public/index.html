@@ -3,28 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Caseyrhodes · Cyber Protocol</title>
+  <title>Cyber Protocol · Caseyrhodes</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    /* ——— reset & base ——— */
+    /* --- reset & base (from BLOOD RAVEN XMD) --- */
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
     body {
-      background: #05080f;
-      font-family: 'JetBrains Mono', monospace;
+      font-family: 'Inter', sans-serif;
+      background: #080c10;
+      color: #e8f5e9;
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 1.5rem;
-      margin: 0;
       position: relative;
       overflow-x: hidden;
     }
 
-    /* ——— dark animated lines (background) ——— */
+    /* --- dark animated lines (background) --- */
     #lines-canvas {
       position: fixed;
       top: 0;
@@ -33,26 +32,26 @@
       height: 100%;
       z-index: 0;
       pointer-events: none;
-      background: transparent;
       opacity: 0.5;
     }
 
-    /* ——— main card (darker) ——— */
+    /* --- main card (darker, glass) --- */
     .cyber-card {
       position: relative;
       z-index: 10;
-      background: #0a0e17;
-      backdrop-filter: blur(2px);
+      background: rgba(12, 17, 24, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       width: 100%;
       max-width: 540px;
       padding: 2rem 2rem 1.8rem;
-      border-radius: 2.5rem 1rem 2.5rem 1rem;
-      box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(60, 130, 255, 0.08);
-      border: 1px solid rgba(30, 60, 120, 0.3);
-      transition: all 0.2s;
+      border-radius: 2rem 1rem 2rem 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(0, 230, 118, 0.06);
+      transition: all 0.25s;
     }
 
-    /* profile picture – centre top (using the URL) */
+    /* --- profile picture (centre) --- */
     .profile-wrapper {
       display: flex;
       justify-content: center;
@@ -63,15 +62,15 @@
       width: 92px;
       height: 92px;
       border-radius: 50%;
-      background: #0b1424;
-      border: 3px solid #2a5599;
-      box-shadow: 0 0 0 4px rgba(20, 50, 120, 0.3), 0 0 30px rgba(30, 80, 200, 0.15);
+      background: #0c1118;
+      border: 2px solid rgba(0, 230, 118, 0.3);
+      box-shadow: 0 0 0 4px rgba(0, 230, 118, 0.08), 0 0 40px rgba(0, 230, 118, 0.08);
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
       transition: 0.25s;
-      background-image: radial-gradient(circle at 30% 30%, #1a3a6e, #0a1428);
+      background-image: radial-gradient(circle at 30% 30%, #1a3a2e, #0a1410);
     }
     .profile-pic img {
       width: 100%;
@@ -81,116 +80,105 @@
     }
     .profile-pic:hover {
       transform: scale(1.02);
-      border-color: #4f87e6;
-      box-shadow: 0 0 0 6px rgba(40, 100, 220, 0.2);
+      border-color: #00e676;
+      box-shadow: 0 0 0 6px rgba(0, 230, 118, 0.15), 0 0 60px rgba(0, 230, 118, 0.08);
     }
 
-    /* ——— title ——— */
+    /* --- title --- */
     .brand-title {
       font-size: 1.9rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      background: linear-gradient(to right, #b0ccff, #6a9aff);
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      background: linear-gradient(120deg, #00e676, #00bcd4);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      text-shadow: 0 0 20px rgba(40, 100, 220, 0.2);
-      line-height: 1.2;
+      text-shadow: 0 0 30px rgba(0, 230, 118, 0.08);
+      line-height: 1.15;
     }
     .brand-sub {
       font-size: 0.7rem;
       letter-spacing: 3px;
-      color: #4a6e9e;
-      border-left: 3px solid #2a4a7a;
+      color: #78909c;
+      border-left: 3px solid rgba(0, 230, 118, 0.3);
       padding-left: 12px;
       margin-top: 4px;
     }
 
-    /* ——— inputs & elements (darker) ——— */
+    /* --- inputs & elements (glass) --- */
     .tech-input {
-      background: rgba(6, 12, 26, 0.9);
-      border: 1px solid #1a3050;
-      color: #d0e4ff;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      color: #e8f5e9;
       border-radius: 14px;
       padding: 0.9rem 1.2rem;
       width: 100%;
       font-size: 0.9rem;
-      font-weight: 400;
+      font-weight: 500;
       outline: none;
       transition: 0.25s;
-      backdrop-filter: blur(2px);
+      backdrop-filter: blur(4px);
+      font-family: 'Inter', sans-serif;
     }
     .tech-input:focus {
-      border-color: #3a70c0;
-      box-shadow: 0 0 0 3px rgba(40, 100, 220, 0.15);
-      background: rgba(8, 16, 34, 0.95);
+      border-color: rgba(0, 230, 118, 0.4);
+      box-shadow: 0 0 0 3px rgba(0, 230, 118, 0.08);
+      background: rgba(255, 255, 255, 0.05);
     }
     .tech-input::placeholder {
-      color: #3a5a7a;
-      font-weight: 300;
-      letter-spacing: 0.5px;
+      color: #37474f;
+      font-weight: 400;
+      letter-spacing: 0.3px;
     }
 
     .btn-execute {
-      background: #142a4e;
+      background: #00e676;
       border: none;
       border-radius: 40px;
       padding: 1rem 1.5rem;
       font-weight: 700;
-      letter-spacing: 1.5px;
-      color: #dceaff;
+      letter-spacing: 1.2px;
+      color: #080c10;
       text-transform: uppercase;
       font-size: 0.9rem;
       transition: 0.25s;
       cursor: pointer;
-      box-shadow: 0 6px 0 #071024, 0 8px 20px rgba(10, 30, 80, 0.4);
+      box-shadow: 0 0 30px rgba(0, 230, 118, 0.15);
       width: 100%;
-      backdrop-filter: blur(2px);
-      border: 1px solid #1f3d6e;
+      font-family: 'Inter', sans-serif;
     }
     .btn-execute:hover {
-      background: #1a3a72;
+      background: #69f0ae;
       transform: translateY(-2px);
-      box-shadow: 0 8px 0 #071024, 0 12px 30px rgba(20, 60, 160, 0.3);
+      box-shadow: 0 0 50px rgba(0, 230, 118, 0.2);
     }
     .btn-execute:active {
-      transform: translateY(4px);
-      box-shadow: 0 2px 0 #071024;
+      transform: translateY(2px);
+      box-shadow: 0 0 20px rgba(0, 230, 118, 0.1);
     }
 
     .status-box {
-      background: rgba(6, 14, 30, 0.7);
-      border-left: 4px solid #2a5a9a;
+      background: rgba(255, 255, 255, 0.02);
+      border-left: 3px solid rgba(0, 230, 118, 0.3);
       border-radius: 12px;
       padding: 0.8rem 1rem;
-      backdrop-filter: blur(2px);
+      backdrop-filter: blur(4px);
     }
 
-    .badge-soft {
-      background: rgba(20, 60, 140, 0.2);
-      color: #6e94d0;
-      border: 1px solid #1a3a6a;
-      border-radius: 40px;
-      padding: 0.2rem 1rem;
-      font-size: 0.65rem;
-      letter-spacing: 1px;
-      font-weight: 700;
-    }
-
-    /* toggle switch (dark blue) */
+    /* --- toggle switch (green/blue) --- */
     .toggle-checkbox:checked + .toggle-slider {
-      background: #1a4a88;
-      box-shadow: 0 0 15px #1a4a88;
+      background: #00bcd4;
+      box-shadow: 0 0 15px rgba(0, 188, 212, 0.2);
     }
     .toggle-slider {
-      background: #12223a;
+      background: rgba(255, 255, 255, 0.06);
       transition: 0.25s;
       border-radius: 999px;
       width: 44px;
       height: 24px;
       position: relative;
       cursor: pointer;
-      border: 1px solid #1a3a5a;
+      border: 1px solid rgba(255, 255, 255, 0.06);
     }
     .toggle-slider::after {
       content: "";
@@ -199,37 +187,40 @@
       left: 2px;
       width: 18px;
       height: 18px;
-      background: #8ab0f0;
+      background: #78909c;
       border-radius: 50%;
       transition: 0.25s;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.4);
     }
     .toggle-checkbox:checked + .toggle-slider::after {
       transform: translateX(20px);
-      background: #c0dcff;
+      background: #e8f5e9;
     }
     .toggle-checkbox {
       display: none;
     }
 
-    /* ——— code block ——— */
+    /* --- code block --- */
     .code-block {
-      background: #070e1e;
-      border: 1px solid #1a325a;
-      border-radius: 14px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 12px;
       padding: 0.6rem 0.9rem;
       font-size: 0.65rem;
-      color: #7a9edc;
+      color: #78909c;
       word-break: break-all;
       font-family: 'JetBrains Mono', monospace;
     }
+    .code-block span {
+      color: #e8f5e9;
+    }
 
-    /* ——— footer ——— */
+    /* --- footer --- */
     .footer-brand {
       font-size: 0.75rem;
-      letter-spacing: 0.5px;
-      color: #4a6e96;
-      border-top: 1px solid #142842;
+      letter-spacing: 0.3px;
+      color: #78909c;
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
       padding-top: 1.2rem;
       margin-top: 0.6rem;
       display: flex;
@@ -237,35 +228,41 @@
       align-items: center;
     }
     .footer-brand strong {
-      color: #aac4f5;
-      font-weight: 700;
-      background: linear-gradient(to right, #7aa7ff, #b6d2ff);
+      font-weight: 800;
+      background: linear-gradient(120deg, #00e676, #00bcd4);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
 
-    /* ——— utilities ——— */
-    .glow-text {
-      text-shadow: 0 0 12px rgba(40, 100, 220, 0.2);
+    /* --- glass cards for settings --- */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 16px;
+      padding: 0.9rem 1.2rem;
+      backdrop-filter: blur(4px);
     }
-    .bg-particles-overlay {
-      background: radial-gradient(circle at 20% 30%, #0a162a, #03060d 80%);
+
+    /* --- responsive --- */
+    @media (max-width: 480px) {
+      .cyber-card { padding: 1.5rem 1.2rem 1.5rem; }
+      .profile-pic { width: 76px; height: 76px; margin-top: -3rem; }
     }
   </style>
 </head>
 <body>
 
-  <!-- animated lines background -->
+  <!-- animated lines background (dark) -->
   <canvas id="lines-canvas"></canvas>
 
   <!-- main card -->
   <div class="cyber-card">
 
-    <!-- profile picture (centre) with the URL -->
+    <!-- profile picture -->
     <div class="profile-wrapper">
       <div class="profile-pic">
-        <img src="https://url.bmbxmd.workers.dev/QF65C.jpg" alt="profile" onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=\'font-size:2.8rem;color:#8ab0f0;\'>CR</span>'">
+        <img src="https://url.bmbxmd.workers.dev/QF65C.jpg" alt="profile" onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=\'font-size:2.6rem;color:#00e676;\'>CR</span>'">
       </div>
     </div>
 
@@ -277,17 +274,17 @@
 
     <!-- url input -->
     <div class="mb-4">
-      <label class="text-[0.6rem] tracking-[0.2em] text-[#3d6a9a] font-bold uppercase block mb-1.5">Target URL</label>
+      <label class="text-[0.6rem] tracking-[0.2em] text-[#78909c] font-bold uppercase block mb-1.5">Target URL</label>
       <input type="text" id="urlInput" 
              class="tech-input" 
              placeholder="https://example.com" value="https://">
     </div>
 
-    <!-- advanced toggle (dark) -->
-    <div class="flex items-center justify-between bg-[#080f1f] p-3 rounded-2xl border border-[#162a4a] mb-4">
+    <!-- advanced toggle (glass) -->
+    <div class="glass-card flex items-center justify-between mb-4">
       <div>
-        <p class="text-sm font-bold text-[#aac0ea] tracking-wide">Advanced Mode</p>
-        <p class="text-[0.55rem] text-[#4a6e92] italic">client‑side render · bypass 403</p>
+        <p class="text-sm font-bold text-[#e8f5e9] tracking-wide">Advanced Mode</p>
+        <p class="text-[0.55rem] text-[#78909c] italic">client‑side render · bypass 403</p>
       </div>
       <label class="relative flex items-center">
         <input type="checkbox" id="advancedMode" class="toggle-checkbox">
@@ -296,13 +293,13 @@
     </div>
 
     <!-- API endpoint -->
-    <div class="bg-[#070e1e] p-3 rounded-2xl border border-[#162a4a] mb-5">
+    <div class="glass-card mb-5">
       <div class="flex justify-between items-center mb-1.5">
-        <span class="text-[0.55rem] font-bold text-[#3d6a9a] tracking-widest">SYSTEM API</span>
-        <span class="text-[0.5rem] bg-[#122a4e] text-[#aac4f0] px-2 py-0.5 rounded-full font-bold">GET</span>
+        <span class="text-[0.55rem] font-bold text-[#78909c] tracking-widest">SYSTEM API</span>
+        <span class="text-[0.5rem] bg-[rgba(0,230,118,0.1)] text-[#00e676] px-2 py-0.5 rounded-full font-bold border border-[rgba(0,230,118,0.1)]">GET</span>
       </div>
       <div class="code-block select-all">
-        /api/convert?url=<span class="text-[#aac4f0]">{TARGET_URL}</span>
+        /api/convert?url=<span>{TARGET_URL}</span>
       </div>
     </div>
 
@@ -314,14 +311,14 @@
     <!-- log -->
     <div id="sysLog" class="status-box mt-5 hidden">
       <div id="logContent" class="text-[0.7rem] space-y-1 max-h-36 overflow-y-auto">
-        <p class="text-[#7aa0e0]">> Initializing scraper...</p>
+        <p class="text-[#78909c]">> Initializing scraper...</p>
       </div>
     </div>
 
     <!-- footer: proudly made by Caseyrhodes Tech -->
     <div class="footer-brand">
       <span>✦ <strong>Proudly made by Caseyrhodes Tech</strong> ✦</span>
-      <span class="text-[0.5rem] bg-[#0f1e38] px-3 py-1 rounded-full text-[#8ab0e8] border border-[#1a3a6a]">READY</span>
+      <span class="text-[0.5rem] bg-[rgba(255,255,255,0.02)] px-3 py-1 rounded-full text-[#78909c] border border-[rgba(255,255,255,0.04)]">READY</span>
     </div>
   </div>
 
@@ -329,13 +326,13 @@
   <iframe id="renderFrame" style="display:none;"></iframe>
 
   <script>
-    // ——— animated lines (background) ———
+    // ——— animated lines (dark, subtle) ———
     (function initLines() {
       const canvas = document.getElementById('lines-canvas');
       const ctx = canvas.getContext('2d');
       let w, h;
       const lines = [];
-      const LINE_COUNT = 18;
+      const LINE_COUNT = 22;
 
       function resize() {
         w = canvas.width = window.innerWidth;
@@ -353,12 +350,11 @@
           this.y1 = Math.random() * h;
           this.x2 = Math.random() * w;
           this.y2 = Math.random() * h;
-          this.speed = 0.15 + Math.random() * 0.25;
+          this.speed = 0.12 + Math.random() * 0.2;
           this.angle = Math.random() * Math.PI * 2;
-          this.length = 40 + Math.random() * 100;
-          this.opacity = 0.03 + Math.random() * 0.08;
-          this.color = `rgba(60, 140, 255, ${this.opacity})`;
-          // direction
+          this.length = 50 + Math.random() * 120;
+          this.opacity = 0.02 + Math.random() * 0.06;
+          this.color = `rgba(0, 230, 118, ${this.opacity})`;
           this.dx = Math.cos(this.angle) * this.speed;
           this.dy = Math.sin(this.angle) * this.speed;
         }
@@ -367,14 +363,10 @@
           this.y1 += this.dy;
           this.x2 += this.dx;
           this.y2 += this.dy;
-
-          // wrap around
           if (this.x1 < -50) { this.x1 = w + 50; this.x2 = this.x1 + this.length * 0.6; }
           if (this.x1 > w + 50) { this.x1 = -50; this.x2 = this.x1 - this.length * 0.6; }
           if (this.y1 < -50) { this.y1 = h + 50; this.y2 = this.y1 + this.length * 0.4; }
           if (this.y1 > h + 50) { this.y1 = -50; this.y2 = this.y1 - this.length * 0.4; }
-
-          // keep x2 relative
           const dx = this.x2 - this.x1;
           const dy = this.y2 - this.y1;
           const dist = Math.hypot(dx, dy);
@@ -403,9 +395,9 @@
           line.update();
           line.draw();
         }
-        // extra subtle glow lines
-        ctx.shadowColor = 'rgba(30, 100, 220, 0.02)';
-        ctx.shadowBlur = 10;
+        // extra subtle glow
+        ctx.shadowColor = 'rgba(0, 230, 118, 0.02)';
+        ctx.shadowBlur = 12;
         for (let line of lines) {
           line.draw();
         }
@@ -415,8 +407,8 @@
       drawLines();
     })();
 
-    // ——— scraper logic ———
-    const log = (msg, color = "#7aa0e0") => {
+    // ——— scraper logic (unchanged) ———
+    const log = (msg, color = "#78909c") => {
       const container = document.getElementById('logContent');
       const p = document.createElement('p');
       p.style.color = color;
@@ -446,7 +438,7 @@
       if (isAdvanced) {
         await executeUserSideExtraction(url);
       } else {
-        log('Executing server‑side scrape ...', '#5f8edb');
+        log('Executing server‑side scrape ...', '#00bcd4');
         window.location.href = `/api/convert?url=${encodeURIComponent(url)}`;
         setTimeout(() => {
           btn.innerText = originalText;
@@ -461,26 +453,26 @@
 
     async function executeUserSideExtraction(targetUrl) {
       try {
-        log('Engaging client‑side render engine ...', '#5f8edb');
+        log('Engaging client‑side render engine ...', '#00bcd4');
         const zip = new JSZip();
 
-        log('Fetching via stealth proxy ...', '#5f8edb');
+        log('Fetching via stealth proxy ...', '#00bcd4');
         const proxyUrl = `/api/proxy?url=${encodeURIComponent(targetUrl)}`;
         const response = await fetch(proxyUrl);
         if (!response.ok) throw new Error(`Server block (${response.status})`);
         const html = await response.text();
 
-        log('Injecting render frame ...', '#5f8edb');
+        log('Injecting render frame ...', '#00bcd4');
         const frame = document.getElementById('renderFrame');
         const frameDoc = frame.contentDocument || frame.contentWindow.document;
         frameDoc.open();
         frameDoc.write(html);
         frameDoc.close();
 
-        log('Waiting for React hydration (8s) ...', '#5f8edb');
+        log('Waiting for React hydration (8s) ...', '#00bcd4');
         await new Promise(r => setTimeout(r, 8000));
 
-        log('Capturing hydrated DOM ...', '#5f8edb');
+        log('Capturing hydrated DOM ...', '#00bcd4');
         const renderedDoc = frameDoc.cloneNode(true);
         const assets = [];
 
@@ -504,7 +496,7 @@
 
         zip.file("index.html", renderedDoc.documentElement.outerHTML);
 
-        log(`Downloading assets (${assets.length}) ...`, '#5f8edb');
+        log(`Downloading assets (${assets.length}) ...`, '#00bcd4');
         for (const asset of assets) {
           try {
             const res = await fetch(`/api/proxy?url=${encodeURIComponent(asset.url)}`);
@@ -515,7 +507,7 @@
           } catch (e) {}
         }
 
-        log('Packing ZIP archive ...', '#8bb8ff');
+        log('Packing ZIP archive ...', '#78909c');
         const content = await zip.generateAsync({ type: "blob" });
         const zipName = new URL(targetUrl).hostname.replace(/\./g, '_') + '_advanced.zip';
 
@@ -524,9 +516,9 @@
         link.download = zipName;
         link.click();
 
-        log('✅ Extraction complete!', '#7aa7ff');
+        log('✅ Extraction complete!', '#00e676');
       } catch (err) {
-        log(`❌ FAILED: ${err.message}`, '#e07070');
+        log(`❌ FAILED: ${err.message}`, '#ff6b6b');
       }
     }
   </script>
