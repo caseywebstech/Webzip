@@ -20,15 +20,54 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow-y: auto; 
+            overflow-y: auto;
             padding: 20px;
+            position: relative;
         }
 
         .anime-border {
             border: 2px solid #00ff88;
             box-shadow: 5px 5px 0px #7000ff;
-            clip-path: polygon(0% 0%, 100% 0%, 100% 95%, 95% 100%, 0% 100%);
+            border-radius: 24px;
+            overflow: hidden;
         }
+
+        .glass-panel {
+            border-radius: 16px;
+        }
+
+        .hexagon-field {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .hexagon {
+            position: absolute;
+            width: 72px;
+            height: 42px;
+            border: 1px solid rgba(0, 255, 136, 0.18);
+            background: rgba(0, 255, 136, 0.025);
+            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+            filter: drop-shadow(0 0 7px rgba(0, 255, 136, 0.08));
+            animation: hexFloat linear infinite;
+        }
+
+        .hexagon:nth-child(3n) { border-color: rgba(112, 0, 255, 0.22); }
+        .hexagon:nth-child(4n) { width: 52px; height: 30px; animation-duration: 17s; }
+        .hexagon:nth-child(5n) { width: 94px; height: 54px; animation-duration: 25s; }
+
+        @keyframes hexFloat {
+            0% { transform: translate3d(-12vw, 110vh, 0) rotate(0deg); opacity: 0; }
+            10% { opacity: .75; }
+            50% { transform: translate3d(48vw, 42vh, 0) rotate(180deg); opacity: .45; }
+            90% { opacity: .7; }
+            100% { transform: translate3d(112vw, -15vh, 0) rotate(360deg); opacity: 0; }
+        }
+
+        .content-layer { position: relative; z-index: 1; }
 
         .tech-input {
             background: rgba(0, 0, 0, 0.7);
@@ -72,7 +111,9 @@
     </style>
 </head>
 <body>
-    <div class="anime-border bg-[#16161e] w-full max-w-lg p-8 relative">
+    <div class="hexagon-field" aria-hidden="true" id="hexagonField"></div>
+
+    <div class="anime-border content-layer bg-[#16161e] w-full max-w-lg p-8 relative">
         <div class="absolute top-2 right-4 text-[10px] opacity-50">VER 5.1.0 // HYBRID_RESTORED</div>
         
         <div class="mb-8">
@@ -86,11 +127,11 @@
             <div>
                 <p class="text-[10px] mb-2 text-purple-400 font-bold tracking-widest">INPUT_TARGET_URL</p>
                 <input type="text" id="urlInput" 
-                    class="tech-input w-full p-4 rounded-sm font-bold italic"
+                    class="tech-input w-full p-4 rounded-xl font-bold italic"
                     placeholder="HTTP://SOURCE_LINK.COM" value="https://">
             </div>
 
-            <div class="flex items-center justify-between p-4 bg-black/40 border border-purple-900/30 rounded">
+            <div class="flex items-center justify-between p-4 bg-black/40 border border-purple-900/30 rounded-2xl">
                 <div>
                     <p class="text-[11px] font-bold text-white uppercase tracking-widest">Advanced Mode</p>
                     <p class="text-[9px] text-gray-500 italic">Automated User-Side Rendering (Bypasses 403/React).</p>
@@ -101,37 +142,37 @@
                 </label>
             </div>
 
-            <div class="p-4 bg-black/40 border border-[#00ff88]/30 rounded">
+            <div class="p-4 bg-black/40 border border-[#00ff88]/30 rounded-2xl">
                 <div class="flex justify-between items-center mb-2">
                     <p class="text-[10px] font-bold text-[#00ff88] uppercase tracking-widest">System API Endpoint</p>
                     <span class="text-[8px] bg-[#00ff88] text-black px-1.5 py-0.5 rounded-sm font-bold">GET</span>
                 </div>
-                <code class="block text-[10px] text-gray-400 break-all p-2 bg-black border border-[#7000ff]/30 rounded select-all selection:bg-[#7000ff] selection:text-white">
+                <code class="block text-[10px] text-gray-400 break-all p-2 bg-black border border-[#7000ff]/30 rounded-xl select-all selection:bg-[#7000ff] selection:text-white">
                     /api/convert?url={<span class="text-white">TARGET_URL</span>}
                 </code>
             </div>
-            <button onclick="runScraper()" id="runBtn" class="btn-execute w-full p-5 italic">
+            <button onclick="runScraper()" id="runBtn" class="btn-execute w-full p-5 italic rounded-2xl">
                 Execute Extraction
             </button>
         </div>
 
-        <div id="resultBox" class="mt-6 p-4 bg-black/50 border border-[#00ff88]/40 rounded hidden">
+        <div id="resultBox" class="mt-6 p-4 bg-black/50 border border-[#00ff88]/40 rounded-2xl hidden">
             <p class="text-[10px] font-bold text-[#00ff88] uppercase tracking-widest mb-3">DOWNLOAD / COPY OPTIONS</p>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <button id="downloadZipBtn" type="button" class="p-3 bg-[#00ff88] text-black font-bold text-[10px] uppercase tracking-wider rounded hover:bg-white transition">
+                <button id="downloadZipBtn" type="button" class="p-3 bg-[#00ff88] text-black font-bold text-[10px] uppercase tracking-wider rounded-xl hover:bg-white transition">
                     Download ZIP
                 </button>
-                <button id="downloadCodeBtn" type="button" class="p-3 bg-[#7000ff] text-white font-bold text-[10px] uppercase tracking-wider rounded hover:bg-white hover:text-black transition">
+                <button id="downloadCodeBtn" type="button" class="p-3 bg-[#7000ff] text-white font-bold text-[10px] uppercase tracking-wider rounded-xl hover:bg-white hover:text-black transition">
                     Download Code
                 </button>
-                <button id="copyCodeBtn" type="button" class="p-3 bg-gray-800 text-white border border-gray-600 font-bold text-[10px] uppercase tracking-wider rounded hover:border-[#00ff88] transition">
+                <button id="copyCodeBtn" type="button" class="p-3 bg-gray-800 text-white border border-gray-600 font-bold text-[10px] uppercase tracking-wider rounded-xl hover:border-[#00ff88] transition">
                     Copy Code
                 </button>
             </div>
             <p id="copyStatus" class="text-[9px] text-gray-500 mt-3 hidden"></p>
         </div>
 
-        <div id="sysLog" class="mt-8 status-box p-4 hidden">
+        <div id="sysLog" class="mt-8 status-box p-4 rounded-xl hidden">
             <div class="text-[11px] space-y-1" id="logContent">
                 <p>> Initializing Scraper...</p>
             </div>
@@ -142,7 +183,7 @@
                 <p class="text-[9px] text-gray-500 uppercase">Tech Authority</p>
                 <p class="text-xs font-bold text-white tracking-widest">LORD INDUMINA</p>
             </div>
-            <div class="text-[10px] bg-[#7000ff] text-white px-2 py-1">READY</div>
+            <div class="text-[10px] bg-[#7000ff] text-white px-2 py-1 rounded-lg">READY</div>
         </div>
     </div>
 
@@ -190,26 +231,81 @@
             downloadBlob(new Blob([currentCode], { type: 'text/html;charset=utf-8' }), currentCodeName);
         });
 
-        document.getElementById('copyCodeBtn').addEventListener('click', async () => {
-            if (!currentCode) return;
+        function setCopyStatus(message, ok = true) {
             const status = document.getElementById('copyStatus');
+            status.textContent = message;
+            status.classList.remove('hidden');
+            status.style.color = ok ? '#00ff88' : '#ff6b6b';
+        }
+
+        async function copyTextToClipboard(text) {
+            if (!text) throw new Error('No code available to copy.');
+
+            // Modern Clipboard API works on HTTPS and localhost.
+            if (navigator.clipboard && window.isSecureContext) {
+                await navigator.clipboard.writeText(text);
+                return;
+            }
+
+            // Reliable fallback for older browsers / WebViews / HTTP contexts.
+            const area = document.createElement('textarea');
+            area.value = text;
+            area.setAttribute('readonly', '');
+            area.style.position = 'fixed';
+            area.style.left = '-9999px';
+            area.style.top = '0';
+            area.style.opacity = '0';
+            document.body.appendChild(area);
+            area.focus();
+            area.select();
+            area.setSelectionRange(0, area.value.length);
+
+            let copied = false;
             try {
-                await navigator.clipboard.writeText(currentCode);
-                status.textContent = 'CODE COPIED TO CLIPBOARD';
-                status.classList.remove('hidden');
-            } catch (error) {
-                const area = document.createElement('textarea');
-                area.value = currentCode;
-                area.style.position = 'fixed';
-                area.style.opacity = '0';
-                document.body.appendChild(area);
-                area.select();
-                document.execCommand('copy');
+                copied = document.execCommand('copy');
+            } finally {
                 area.remove();
-                status.textContent = 'CODE COPIED TO CLIPBOARD';
-                status.classList.remove('hidden');
+            }
+            if (!copied) throw new Error('Clipboard permission was denied.');
+        }
+
+        document.getElementById('copyCodeBtn').addEventListener('click', async () => {
+            const button = document.getElementById('copyCodeBtn');
+            if (!currentCode) {
+                setCopyStatus('NO CODE AVAILABLE — RUN EXTRACTION FIRST.', false);
+                return;
+            }
+
+            const originalText = button.textContent;
+            button.disabled = true;
+            button.textContent = 'COPYING...';
+            try {
+                await copyTextToClipboard(currentCode);
+                setCopyStatus('✓ CODE COPIED TO CLIPBOARD');
+                button.textContent = 'COPIED ✓';
+                setTimeout(() => { button.textContent = originalText; }, 1800);
+            } catch (error) {
+                setCopyStatus('COPY FAILED — ALLOW CLIPBOARD PERMISSION AND TRY AGAIN.', false);
+                button.textContent = 'TRY AGAIN';
+            } finally {
+                button.disabled = false;
             }
         });
+
+        // Lightweight animated hexagon field for the cyber background.
+        (() => {
+            const field = document.getElementById('hexagonField');
+            const count = 24;
+            for (let i = 0; i < count; i++) {
+                const hex = document.createElement('span');
+                hex.className = 'hexagon';
+                hex.style.left = `${Math.random() * 100}%`;
+                hex.style.animationDelay = `${-Math.random() * 24}s`;
+                hex.style.animationDuration = `${15 + Math.random() * 14}s`;
+                hex.style.opacity = `${0.18 + Math.random() * 0.45}`;
+                field.appendChild(hex);
+            }
+        })();
 
         async function runScraper() {
             const url = document.getElementById('urlInput').value.trim();
